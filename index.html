@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India Pune - Dynamic Yard & Exit Saddle Tracking</title>
+    <title>AM/NS India Pune - Dynamic Yard Layer Filter System</title>
     <style>
         :root {
             --amns-red: #E30613;
@@ -13,6 +13,8 @@
             --amns-white: #FFFFFF;
             --accent-green: #28A745;
             --accent-blue: #007BFF;
+            --accent-purple: #6F42C1;
+            --accent-orange: #FD7E14;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -69,7 +71,6 @@
         .saddle-slot { background: var(--amns-white); border: 1px solid var(--amns-gray); border-radius: 4px; padding: 6px 4px; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .saddle-slot input { width: 95%; text-align: center; padding: 4px; border: 1px solid #CCC; border-radius: 3px; font-size: 11px; font-weight: bold; }
 
-        /* ANIMATED PLACED BUTTON */
         .btn-place-saddle { 
             background-color: var(--accent-blue); color: white; border: none; 
             padding: 5px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; font-weight: bold; width: 95%; 
@@ -88,7 +89,7 @@
 
         .btn-submit { background-color: var(--amns-red); color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
         
-        /* Work Cards */
+        /* Task Cards */
         .task-card { border-left: 5px solid var(--amns-red); background: #FFF5F5; padding: 12px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .task-info { display: flex; flex-direction: column; gap: 4px; }
         .task-coil { font-size: 18px; font-weight: bold; color: var(--amns-red); }
@@ -97,9 +98,22 @@
         .btn-pickup { background-color: var(--accent-green); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
         /* Yard Layout Grid Interactive Map */
-        .yard-selector { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; }
+        .yard-selector { display: flex; gap: 8px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
         .yard-tab { padding: 6px 12px; background: var(--amns-light); border: 1px solid #DEE2E6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap; }
         .yard-tab.active { background: var(--amns-dark); color: white; border-color: var(--amns-dark); }
+
+        /* Layer Selection Bar */
+        .layer-selector-bar {
+            display: flex; gap: 8px; background: #E9ECEF; padding: 8px; border-radius: 6px; margin-bottom: 12px; align-items: center;
+        }
+        .layer-tab-btn {
+            flex: 1; padding: 8px; border: 1px solid #CCC; background: white; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center;
+            transition: all 0.2s ease;
+        }
+        .layer-tab-btn.active-layer-all { background: var(--amns-dark); color: white; border-color: var(--amns-dark); }
+        .layer-tab-btn.active-layer-1 { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+        .layer-tab-btn.active-layer-2 { background: var(--accent-orange); color: white; border-color: var(--accent-orange); }
+        .layer-tab-btn.active-layer-3 { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
 
         .grid-container { display: grid; grid-template-columns: 35px repeat(5, 1fr); gap: 6px; background: #E9ECEF; padding: 10px; border-radius: 6px; }
         .grid-header, .row-label { background: var(--amns-dark); color: white; text-align: center; padding: 6px 0; font-weight: bold; font-size: 12px; border-radius: 3px; }
@@ -114,9 +128,10 @@
             background-color: #F0F7FF;
             transform: translateY(-2px);
         }
-        .grid-cell.occupied { 
-            background-color: #E3F2FD; border: 2px solid var(--accent-blue); 
-        }
+        .grid-cell.occupied-l1 { background-color: #E3F2FD; border: 2px solid var(--accent-blue); }
+        .grid-cell.occupied-l2 { background-color: #FFF3CD; border: 2px solid var(--accent-orange); }
+        .grid-cell.occupied-l3 { background-color: #F3E5F5; border: 2px solid var(--accent-purple); }
+
         .grid-cell.placement-target {
             animation: pulseBorder 1s infinite alternate;
             border-color: var(--accent-green) !important;
@@ -130,7 +145,10 @@
 
         .cell-id { font-size: 10px; color: var(--amns-gray); font-weight: bold; }
         .cell-content { font-size: 11px; font-weight: bold; text-align: center; color: var(--amns-dark); }
-        .layer-badge { align-self: flex-end; font-size: 8px; background: var(--amns-red); color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; }
+        
+        .layer-badge-1 { font-size: 8px; background: var(--accent-blue); color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; align-self: flex-end; }
+        .layer-badge-2 { font-size: 8px; background: var(--accent-orange); color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; align-self: flex-end; }
+        .layer-badge-3 { font-size: 8px; background: var(--accent-purple); color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; align-self: flex-end; }
 
         .placement-banner {
             background-color: #007BFF; color: white; padding: 10px 14px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; align-items: center; justify-content: space-between;
@@ -341,19 +359,20 @@
                         <span>Storage Yard Layout Grid Map</span>
                     </div>
 
-                    <!-- Placement Mode Instruction Banner & Layer Options -->
+                    <!-- Placement Mode Instruction Banner & Stacking Option -->
                     <div id="placement-banner" class="placement-banner">
-                        <span>👇 TAP ANY CELL TO STORE COIL [<span id="active-transfer-coil"></span>]</span>
+                        <span>👇 TAP CELL TO PLACE COIL [<span id="active-transfer-coil"></span>]</span>
                         <div>
-                            <label>Target Layer:</label>
+                            <label>Store At Layer:</label>
                             <select id="selected-layer-opt" class="layer-select-box">
                                 <option value="1">Layer 1 (Base)</option>
-                                <option value="2">Layer 2 (Middle)</option>
-                                <option value="3">Layer 3 (Top)</option>
+                                <option value="2">Layer 2 (Saddle)</option>
+                                <option value="3">Layer 3 (Peak)</option>
                             </select>
                         </div>
                     </div>
 
+                    <!-- Yard Section Selector -->
                     <div class="yard-selector">
                         <button class="yard-tab active" onclick="switchYard('CGL 1 PRIME')">CGL 1 PRIME</button>
                         <button class="yard-tab" onclick="switchYard('CGL 2 PRIME')">CGL 2 PRIME</button>
@@ -361,6 +380,15 @@
                         <button class="yard-tab" onclick="switchYard('CGL 2 REWORK')">CGL 2 REWORK</button>
                         <button class="yard-tab" onclick="switchYard('CGL BABY COIL')">CGL BABY COIL</button>
                         <button class="yard-tab" onclick="switchYard('CGL SCRAP')">CGL SCRAP</button>
+                    </div>
+
+                    <!-- MAP LAYER VIEW FILTER BUTTONS (ALL / L1 / L2 / L3) -->
+                    <div class="layer-selector-bar">
+                        <span style="font-size:12px; font-weight:bold; color:var(--amns-dark);">Map View Layer Filter:</span>
+                        <button id="btn-layer-all" class="layer-tab-btn active-layer-all" onclick="setLayerFilter('ALL')">ALL LAYERS</button>
+                        <button id="btn-layer-1" class="layer-tab-btn" onclick="setLayerFilter(1)">LAYER 1 MAP</button>
+                        <button id="btn-layer-2" class="layer-tab-btn" onclick="setLayerFilter(2)">LAYER 2 MAP</button>
+                        <button id="btn-layer-3" class="layer-tab-btn" onclick="setLayerFilter(3)">LAYER 3 MAP</button>
                     </div>
 
                     <div class="grid-container" id="grid-container"></div>
@@ -374,7 +402,8 @@
     <script>
         let currentUserRole = null;
         let activeYard = 'CGL 1 PRIME';
-        let pendingYardPlacement = null; // Stores request object being transferred into yard map
+        let activeLayerFilter = 'ALL'; // Layer filter state: 'ALL', 1, 2, or 3
+        let pendingYardPlacement = null; 
 
         // Exit Saddles Database
         let saddleDatabase = {
@@ -391,11 +420,12 @@
             'UK SLITTER EXIT': { p1: ['', '', ''], p2: ['', '', ''] }
         };
 
-        // Yard Database (With Pyramid Layer Naming Pattern)
+        // Yard Database (Structured by Cell ID and Layers)
         let yardDatabase = {
             'CGL 1 PRIME': {
                 'A1': { coil: 'C-8010', layer: 1, namePattern: 'A1' },
-                'B2': { coil: 'C-8011', layer: 2, namePattern: 'B2C2' }
+                'B2': { coil: 'C-8011', layer: 2, namePattern: 'B2C2' },
+                'C3': { coil: 'C-8012', layer: 3, namePattern: 'C3D3E3' }
             },
             'CGL 2 PRIME': {},
             'CGL 1 REWORK': {},
@@ -478,7 +508,6 @@
             setSaddleSlot('p2', 2, 'pit2-pos3', 'btn-p2-2');
         }
 
-        // Animated Button Click for Saddle Place (No Alerts)
         function placeCoilOnSaddle(pit, posIndex, inputId, btnId) {
             const dept = document.getElementById('saddle-dept-select').value;
             const val = document.getElementById(inputId).value.trim().toUpperCase();
@@ -494,7 +523,6 @@
             renderReceiverSaddles();
         }
 
-        // Render Live Exit Saddles for Receiver/Crane Display
         function renderReceiverSaddles() {
             const receiverContainer = document.getElementById('receiver-saddle-container');
             const badge = document.getElementById('saddle-badge');
@@ -542,7 +570,6 @@
             activateYardPlacementMode();
         }
 
-        // Enable Tap-to-Place Mode on Yard Map + AUTO SCROLL TO YARD
         function activateYardPlacementMode() {
             if (!pendingYardPlacement) return;
 
@@ -552,16 +579,15 @@
 
             renderGrid();
 
-            // AUTO SCROLL TO YARD GRID SECTION TO PREVENT WRONG LOCATION SELECTION
+            // Auto-scroll directly to yard grid map
             document.getElementById('yard-grid-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Complete Transfer for Entry Section (DELIVERS DIRECTLY TO ENTRY SECTION - NO YARD OPTION)
+        // Complete Transfer directly to Entry Section (NO YARD OPTION)
         function completeEntryTransfer(reqId) {
             const req = pendingRequests.find(r => r.id === reqId);
             if (!req) return;
 
-            // Clear saddle origin if applicable
             if (req.saddleOrigin) {
                 const { dept, pitKey, posIdx } = req.saddleOrigin;
                 if (saddleDatabase[dept] && saddleDatabase[dept][pitKey]) {
@@ -569,14 +595,25 @@
                 }
             }
 
-            // Remove request from pending queue
             pendingRequests = pendingRequests.filter(r => r.id !== reqId);
 
-            document.getElementById('search-result-display').textContent = `COMPLETED: Coil [${req.coil}] delivered directly to [${req.to}].`;
+            document.getElementById('search-result-display').textContent = `DELIVERED: Coil [${req.coil}] sent directly to [${req.to}].`;
 
             changeSaddleDepartment();
             renderReceiverSaddles();
             renderQueue();
+        }
+
+        // Set Map Layer Filter View (ALL, 1, 2, 3)
+        function setLayerFilter(layer) {
+            activeLayerFilter = layer;
+
+            document.getElementById('btn-layer-all').className = 'layer-tab-btn' + (layer === 'ALL' ? ' active-layer-all' : '');
+            document.getElementById('btn-layer-1').className = 'layer-tab-btn' + (layer === 1 ? ' active-layer-1' : '');
+            document.getElementById('btn-layer-2').className = 'layer-tab-btn' + (layer === 2 ? ' active-layer-2' : '');
+            document.getElementById('btn-layer-3').className = 'layer-tab-btn' + (layer === 3 ? ' active-layer-3' : '');
+
+            renderGrid();
         }
 
         // Handle Direct Tap on Yard Grid Cell
@@ -584,7 +621,7 @@
             if (!pendingYardPlacement) {
                 const currentData = yardDatabase[activeYard][baseCellId];
                 if (currentData) {
-                    document.getElementById('search-result-display').textContent = `SELECTED CELL [${currentData.namePattern}]: Coil [${currentData.coil}] (Layer ${currentData.layer})`;
+                    document.getElementById('search-result-display').textContent = `CELL [${currentData.namePattern}]: Coil [${currentData.coil}] (Layer ${currentData.layer})`;
                 }
                 return;
             }
@@ -596,7 +633,7 @@
                 yardDatabase[activeYard] = {};
             }
 
-            // Pyramid Naming Pattern Logic (e.g. Layer 1 = A1, Layer 2 = A1B1, Layer 3 = A1B1C1)
+            // Pyramid Naming Pattern Logic
             let formattedNamePattern = baseCellId;
             if (selectedLayer === 2) {
                 const nextCol = String.fromCharCode(baseCellId.charCodeAt(0) + 1);
@@ -614,7 +651,6 @@
                 namePattern: formattedNamePattern
             };
 
-            // Clear saddle origin if applicable
             if (pendingYardPlacement.saddleOrigin) {
                 const { dept, pitKey, posIdx } = pendingYardPlacement.saddleOrigin;
                 if (saddleDatabase[dept] && saddleDatabase[dept][pitKey]) {
@@ -622,21 +658,17 @@
                 }
             }
 
-            // Remove from request queue if present
             pendingRequests = pendingRequests.filter(r => r.id !== pendingYardPlacement.id);
 
-            // Reset Placement State
             pendingYardPlacement = null;
             document.getElementById('placement-banner').style.display = 'none';
 
-            // Refresh Screen Components
             changeSaddleDepartment();
             renderReceiverSaddles();
             renderQueue();
             renderGrid();
         }
 
-        // Handle Transfer Request (User Dispatches Request)
         function handleTransferRequest(e) {
             e.preventDefault();
             const coil = document.getElementById('req-coil-id').value.trim().toUpperCase();
@@ -645,7 +677,6 @@
             let detectedLocation = null;
             let saddleRef = null;
 
-            // Search Exit Saddles
             for (let dept in saddleDatabase) {
                 const p1 = saddleDatabase[dept].p1;
                 const p2 = saddleDatabase[dept].p2;
@@ -664,7 +695,6 @@
                 }
             }
 
-            // Search Storage Yard
             if (!detectedLocation) {
                 for (let yard in yardDatabase) {
                     for (let loc in yardDatabase[yard]) {
@@ -693,7 +723,6 @@
             renderQueue();
         }
 
-        // Render Crane Queue & User Monitor
         function renderQueue() {
             const craneContainer = document.getElementById('crane-queue-container');
             const userMonitor = document.getElementById('user-status-container');
@@ -713,7 +742,6 @@
             }
 
             pendingRequests.forEach(req => {
-                // Crane Display Card (DELIVERS DIRECTLY TO ENTRY SECTION)
                 const card = document.createElement('div');
                 card.className = 'task-card';
                 card.innerHTML = `
@@ -726,7 +754,6 @@
                 `;
                 craneContainer.appendChild(card);
 
-                // User Display Card
                 const userCard = document.createElement('div');
                 userCard.className = 'task-card';
                 userCard.style.borderLeftColor = '#007BFF';
@@ -742,7 +769,7 @@
             });
         }
 
-        // Render Interactive Yard Grid Map
+        // Render Yard Grid with Dynamic Layer Filters
         function renderGrid() {
             const gridContainer = document.getElementById('grid-container');
             gridContainer.innerHTML = '';
@@ -767,15 +794,16 @@
                     const currentYardData = yardDatabase[activeYard] || {};
                     const coilData = currentYardData[locId];
 
-                    if (coilData) {
-                        cell.classList.add('occupied');
+                    // LAYER FILTER LOGIC
+                    if (coilData && (activeLayerFilter === 'ALL' || activeLayerFilter === coilData.layer)) {
+                        cell.classList.add(`occupied-l${coilData.layer}`);
                         cell.innerHTML = `
                             <div class="cell-id">${coilData.namePattern}</div>
                             <div class="cell-content">${coilData.coil}</div>
-                            <div class="layer-badge">Layer ${coilData.layer}</div>
+                            <div class="layer-badge-${coilData.layer}">Layer ${coilData.layer}</div>
                         `;
                     } else {
-                        cell.innerHTML = `<div class="cell-id">${locId}</div><div class="cell-content" style="color:#bbb;">Tap</div>`;
+                        cell.innerHTML = `<div class="cell-id">${locId}</div><div class="cell-content" style="color:#ccc;">Empty</div>`;
                     }
 
                     gridContainer.appendChild(cell);
@@ -807,7 +835,6 @@
                 return;
             }
 
-            // Search Saddles
             for (let dept in saddleDatabase) {
                 const p1 = saddleDatabase[dept].p1;
                 const p2 = saddleDatabase[dept].p2;
@@ -822,7 +849,6 @@
                 }
             }
 
-            // Search Yards
             for (let yard in yardDatabase) {
                 for (let loc in yardDatabase[yard]) {
                     if (yardDatabase[yard][loc].coil === query) {
