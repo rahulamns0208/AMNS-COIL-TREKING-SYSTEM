@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India Pune - Online Coil Tracking System</title>
+    <title>AM/NS India Pune - Dynamic Yard & Exit Saddle Tracking</title>
     <style>
         :root {
             --amns-red: #E30613;
@@ -69,7 +69,17 @@
         .saddle-slot { background: var(--amns-white); border: 1px solid var(--amns-gray); border-radius: 4px; padding: 6px 4px; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .saddle-slot input { width: 95%; text-align: center; padding: 4px; border: 1px solid #CCC; border-radius: 3px; font-size: 11px; font-weight: bold; }
 
-        .btn-place-saddle { background-color: var(--accent-blue); color: white; border: none; padding: 4px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: bold; width: 95%; }
+        /* ANIMATED PLACED BUTTON */
+        .btn-place-saddle { 
+            background-color: var(--accent-blue); color: white; border: none; 
+            padding: 5px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; font-weight: bold; width: 95%; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-place-saddle.placed-active {
+            background-color: var(--accent-green) !important;
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
+        }
 
         /* Form Controls */
         .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
@@ -86,23 +96,50 @@
 
         .btn-pickup { background-color: var(--accent-green); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
-        /* Grid Map */
+        /* Yard Layout Grid Interactive Map */
         .yard-selector { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; }
         .yard-tab { padding: 6px 12px; background: var(--amns-light); border: 1px solid #DEE2E6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap; }
         .yard-tab.active { background: var(--amns-dark); color: white; border-color: var(--amns-dark); }
 
-        .grid-container { display: grid; grid-template-columns: 35px repeat(5, 1fr); gap: 5px; background: #E9ECEF; padding: 8px; border-radius: 6px; }
+        .grid-container { display: grid; grid-template-columns: 35px repeat(5, 1fr); gap: 6px; background: #E9ECEF; padding: 10px; border-radius: 6px; }
         .grid-header, .row-label { background: var(--amns-dark); color: white; text-align: center; padding: 6px 0; font-weight: bold; font-size: 12px; border-radius: 3px; }
-        .grid-cell { background: white; border: 1px solid #CED4DA; min-height: 55px; border-radius: 4px; padding: 3px; display: flex; flex-direction: column; justify-content: space-between; }
-        .grid-cell.occupied { background-color: #E8F4FE; border-color: var(--accent-blue); }
-        .cell-id { font-size: 9px; color: var(--amns-gray); font-weight: bold; }
-        .cell-content { font-size: 10px; font-weight: bold; text-align: center; color: var(--amns-dark); }
-        .layer-badge { align-self: flex-end; font-size: 8px; background: var(--amns-red); color: white; padding: 1px 3px; border-radius: 2px; }
+        
+        .grid-cell { 
+            background: white; border: 2px dashed #B0BEC5; min-height: 60px; border-radius: 5px; padding: 4px; 
+            display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .grid-cell:hover {
+            border-color: var(--accent-blue);
+            background-color: #F0F7FF;
+            transform: translateY(-2px);
+        }
+        .grid-cell.occupied { 
+            background-color: #E3F2FD; border: 2px solid var(--accent-blue); 
+        }
+        .grid-cell.placement-target {
+            animation: pulseBorder 1s infinite alternate;
+            border-color: var(--accent-green) !important;
+            background-color: #E8F5E9 !important;
+        }
+
+        @keyframes pulseBorder {
+            0% { box-shadow: 0 0 2px var(--accent-green); }
+            100% { box-shadow: 0 0 10px var(--accent-green); }
+        }
+
+        .cell-id { font-size: 10px; color: var(--amns-gray); font-weight: bold; }
+        .cell-content { font-size: 11px; font-weight: bold; text-align: center; color: var(--amns-dark); }
+        .layer-badge { align-self: flex-end; font-size: 8px; background: var(--amns-red); color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; }
+
+        .placement-banner {
+            background-color: #007BFF; color: white; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-bottom: 10px; text-align: center; display: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN OVERLAY -->
     <div id="login-overlay" class="login-overlay">
         <div class="login-card">
             <div class="logo-badge" style="margin:0 auto 10px auto; width: fit-content;">AM/NS</div>
@@ -135,7 +172,7 @@
             <div class="logo-badge">AM/NS</div>
             <div>
                 <div class="app-title">AM/NS INDIA - PUNE FACILITY</div>
-                <div class="sub-title">Online Dynamic Exit Saddle & Entry Dispatch System</div>
+                <div class="sub-title">Online Dynamic Exit Saddle & Interactive Yard Grid System</div>
             </div>
         </div>
 
@@ -158,7 +195,6 @@
         
         <!-- USER WORKSPACE -->
         <div id="user-workspace" class="workspace hidden">
-            <!-- Left Side: Exit Saddles & Transfer Request Form -->
             <div style="flex: 1; max-width: 480px;">
                 
                 <!-- Exit Saddles Panel -->
@@ -191,17 +227,17 @@
                             <div class="saddle-slot">
                                 Pos 1
                                 <input type="text" id="pit1-pos1" placeholder="Coil No">
-                                <button class="btn-place-saddle" onclick="placeCoilOnSaddle('p1', 0, 'pit1-pos1')">Placed</button>
+                                <button id="btn-p1-0" class="btn-place-saddle" onclick="placeCoilOnSaddle('p1', 0, 'pit1-pos1', 'btn-p1-0')">Placed</button>
                             </div>
                             <div class="saddle-slot">
                                 Pos 2
                                 <input type="text" id="pit1-pos2" placeholder="Coil No">
-                                <button class="btn-place-saddle" onclick="placeCoilOnSaddle('p1', 1, 'pit1-pos2')">Placed</button>
+                                <button id="btn-p1-1" class="btn-place-saddle" onclick="placeCoilOnSaddle('p1', 1, 'pit1-pos2', 'btn-p1-1')">Placed</button>
                             </div>
                             <div class="saddle-slot">
                                 Pos 3
                                 <input type="text" id="pit1-pos3" placeholder="Coil No">
-                                <button class="btn-place-saddle" onclick="placeCoilOnSaddle('p1', 2, 'pit1-pos3')">Placed</button>
+                                <button id="btn-p1-2" class="btn-place-saddle" onclick="placeCoilOnSaddle('p1', 2, 'pit1-pos3', 'btn-p1-2')">Placed</button>
                             </div>
                         </div>
                     </div>
@@ -213,23 +249,23 @@
                             <div class="saddle-slot">
                                 Pos 1
                                 <input type="text" id="pit2-pos1" placeholder="Coil No">
-                                <button class="btn-place-saddle" onclick="placeCoilOnSaddle('p2', 0, 'pit2-pos1')">Placed</button>
+                                <button id="btn-p2-0" class="btn-place-saddle" onclick="placeCoilOnSaddle('p2', 0, 'pit2-pos1', 'btn-p2-0')">Placed</button>
                             </div>
                             <div class="saddle-slot">
                                 Pos 2
                                 <input type="text" id="pit2-pos2" placeholder="Coil No">
-                                <button class="btn-place-saddle" onclick="placeCoilOnSaddle('p2', 1, 'pit2-pos2')">Placed</button>
+                                <button id="btn-p2-1" class="btn-place-saddle" onclick="placeCoilOnSaddle('p2', 1, 'pit2-pos2', 'btn-p2-1')">Placed</button>
                             </div>
                             <div class="saddle-slot">
                                 Pos 3
                                 <input type="text" id="pit2-pos3" placeholder="Coil No">
-                                <button class="btn-place-saddle" onclick="placeCoilOnSaddle('p2', 2, 'pit2-pos3')">Placed</button>
+                                <button id="btn-p2-2" class="btn-place-saddle" onclick="placeCoilOnSaddle('p2', 2, 'pit2-pos3', 'btn-p2-2')">Placed</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Transfer Request Section (Restricted Strictly to Department Entry Options) -->
+                <!-- Transfer Request Section -->
                 <div class="panel">
                     <div class="panel-header">
                         <span>Coil Entry Transfer Request</span>
@@ -263,7 +299,7 @@
 
             </div>
 
-            <!-- Right Side: User Pending Status Monitor -->
+            <!-- User Monitor -->
             <div style="flex: 1;">
                 <div class="panel">
                     <div class="panel-header">
@@ -274,11 +310,11 @@
             </div>
         </div>
 
-        <!-- CRANE OPERATOR WORKSPACE (RECEIVER) -->
+        <!-- CRANE OPERATOR WORKSPACE -->
         <div id="receiver-workspace" class="workspace hidden">
             <div style="flex: 1; display:flex; flex-direction:column; gap:15px;">
                 
-                <!-- Section 1: Live Exit Saddles with Pickup Buttons -->
+                <!-- Section 1: Live Exit Saddles -->
                 <div class="panel">
                     <div class="panel-header">
                         <span>LIVE LINE EXIT SADDLES (COILS READY FOR PICKUP)</span>
@@ -296,10 +332,15 @@
                     <div id="crane-queue-container"></div>
                 </div>
 
-                <!-- Section 3: Storage Yard Grid Map -->
+                <!-- Section 3: Interactive Storage Yard Grid Map -->
                 <div class="panel" style="flex:1;">
                     <div class="panel-header">
                         <span>Storage Yard Layout Grid Map</span>
+                    </div>
+
+                    <!-- Placement Mode Instruction Banner -->
+                    <div id="placement-banner" class="placement-banner">
+                        👇 TAP ANY CELL ON THE MAP BELOW TO STORE COIL [<span id="active-transfer-coil"></span>] IMMEDIATELY
                     </div>
 
                     <div class="yard-selector">
@@ -322,6 +363,7 @@
     <script>
         let currentUserRole = null;
         let activeYard = 'CGL 1 PRIME';
+        let pendingYardPlacement = null; // Stores request object being transferred into yard map
 
         // Exit Saddles Database
         let saddleDatabase = {
@@ -341,8 +383,8 @@
         // Yard Database
         let yardDatabase = {
             'CGL 1 PRIME': {
-                'A1': { coil: 'C-8010', layer: 1, heightName: 'A1' },
-                'A1B1': { coil: 'C-8011', layer: 2, heightName: 'A1B1' }
+                'A1': { coil: 'C-8010', layer: 1 },
+                'B2': { coil: 'C-8011', layer: 1 }
             },
             'CGL 2 PRIME': {},
             'CGL 1 REWORK': {},
@@ -367,7 +409,6 @@
             } else if (role === 'CRANE' && pass === 'CRANE123') {
                 currentUserRole = 'CRANE';
             } else {
-                alert('Invalid Credentials! Use USER / USER123 or CRANE / CRANE123');
                 return;
             }
 
@@ -401,28 +442,46 @@
             document.getElementById('pit2-title').textContent = `${dept} - PIT 2 SADDLE`;
 
             const data = saddleDatabase[dept] || { p1: ['', '', ''], p2: ['', '', ''] };
-            document.getElementById('pit1-pos1').value = data.p1[0] || '';
-            document.getElementById('pit1-pos2').value = data.p1[1] || '';
-            document.getElementById('pit1-pos3').value = data.p1[2] || '';
+            
+            // Populate Inputs and reset button styles dynamically
+            const setSaddleSlot = (pit, idx, inputId, btnId) => {
+                const val = data[pit][idx] || '';
+                const inputEl = document.getElementById(inputId);
+                const btnEl = document.getElementById(btnId);
+                inputEl.value = val;
 
-            document.getElementById('pit2-pos1').value = data.p2[0] || '';
-            document.getElementById('pit2-pos2').value = data.p2[1] || '';
-            document.getElementById('pit2-pos3').value = data.p2[2] || '';
+                if (val) {
+                    btnEl.classList.add('placed-active');
+                    btnEl.textContent = '✓ Placed';
+                } else {
+                    btnEl.classList.remove('placed-active');
+                    btnEl.textContent = 'Placed';
+                }
+            };
+
+            setSaddleSlot('p1', 0, 'pit1-pos1', 'btn-p1-0');
+            setSaddleSlot('p1', 1, 'pit1-pos2', 'btn-p1-1');
+            setSaddleSlot('p1', 2, 'pit1-pos3', 'btn-p1-2');
+
+            setSaddleSlot('p2', 0, 'pit2-pos1', 'btn-p2-0');
+            setSaddleSlot('p2', 1, 'pit2-pos2', 'btn-p2-1');
+            setSaddleSlot('p2', 2, 'pit2-pos3', 'btn-p2-2');
         }
 
-        // Tap "Placed" on exit saddle
-        function placeCoilOnSaddle(pit, posIndex, inputId) {
+        // Animated Button Click for Saddle Place (No Alerts)
+        function placeCoilOnSaddle(pit, posIndex, inputId, btnId) {
             const dept = document.getElementById('saddle-dept-select').value;
             const val = document.getElementById(inputId).value.trim().toUpperCase();
+            const btn = document.getElementById(btnId);
 
-            if (!val) {
-                alert("Please enter a Coil Number first.");
-                return;
-            }
+            if (!val) return;
 
             saddleDatabase[dept][pit][posIndex] = val;
-            alert(`Coil [${val}] placed on ${dept} (${pit.toUpperCase()} - Pos ${posIndex + 1}). Updated on Receiver Screen.`);
-            
+
+            // Trigger Animation & Color Shift to Green
+            btn.classList.add('placed-active');
+            btn.textContent = '✓ Placed';
+
             renderReceiverSaddles();
         }
 
@@ -449,7 +508,7 @@
                                     <div class="task-coil" style="color:#007BFF;">COIL: ${coil}</div>
                                     <div class="task-route"><strong>SADDLE LOCATION:</strong> ${dept} (${pitName} - Pos ${idx + 1})</div>
                                 </div>
-                                <button class="btn-pickup" onclick="cranePickupDirect('${dept}', '${pitKey}', ${idx}, '${coil}')">Pick Up</button>
+                                <button class="btn-pickup" onclick="cranePickupDirect('${dept}', '${pitKey}', ${idx}, '${coil}')">Pick Up to Yard</button>
                             `;
                             receiverContainer.appendChild(card);
                         }
@@ -463,20 +522,87 @@
             }
         }
 
-        // Direct Crane Pick Up from Exit Saddle
+        // Direct Pickup from Exit Saddle into Yard Placement Mode
         function cranePickupDirect(dept, pitKey, posIdx, coil) {
-            const targetEntry = prompt(`DIRECT PICKUP: Coil [${coil}]\nEnter Target Entry Department for Transfer (e.g. CGL 1 ENTRY, CRM 1 ENTRY):`, "CGL 1 ENTRY");
-            if (!targetEntry) return;
+            pendingYardPlacement = {
+                id: Date.now(),
+                coil: coil,
+                saddleOrigin: { dept, pitKey, posIdx }
+            };
 
-            // Clear saddle slot
-            saddleDatabase[dept][pitKey][posIdx] = '';
-            alert(`Coil ${coil} picked up from ${dept} and successfully delivered to ${targetEntry}. Saddle position cleared.`);
-
-            changeSaddleDepartment();
-            renderReceiverSaddles();
+            activateYardPlacementMode();
         }
 
-        // Handle Transfer Request (With Auto-Detection & Unknown Location Rejection)
+        // Initiate Transfer from Queue
+        function completeTransfer(reqId) {
+            const req = pendingRequests.find(r => r.id === reqId);
+            if (!req) return;
+
+            pendingYardPlacement = req;
+            activateYardPlacementMode();
+        }
+
+        // Enable Tap-to-Place Mode on Yard Map
+        function activateYardPlacementMode() {
+            if (!pendingYardPlacement) return;
+
+            const banner = document.getElementById('placement-banner');
+            document.getElementById('active-transfer-coil').textContent = pendingYardPlacement.coil;
+            banner.style.display = 'block';
+
+            renderGrid();
+        }
+
+        // Handle Direct Tap on Yard Grid Cell (No Popups)
+        function handleCellTap(locId) {
+            if (!pendingYardPlacement) {
+                // Normal view mode: Show stored coil info in search bar area
+                const currentData = yardDatabase[activeYard][locId];
+                if (currentData) {
+                    document.getElementById('search-result-display').textContent = `SELECTED CELL ${locId}: Coil [${currentData.coil}] (Layer ${currentData.layer})`;
+                }
+                return;
+            }
+
+            // Yard Placement Mode Active: Automatically place coil into clicked cell
+            const targetCoil = pendingYardPlacement.coil;
+
+            if (!yardDatabase[activeYard]) {
+                yardDatabase[activeYard] = {};
+            }
+
+            // Stack layer logic
+            const existing = yardDatabase[activeYard][locId];
+            const layer = existing ? existing.layer + 1 : 1;
+
+            yardDatabase[activeYard][locId] = {
+                coil: targetCoil,
+                layer: layer
+            };
+
+            // Clear saddle origin if applicable
+            if (pendingYardPlacement.saddleOrigin) {
+                const { dept, pitKey, posIdx } = pendingYardPlacement.saddleOrigin;
+                if (saddleDatabase[dept] && saddleDatabase[dept][pitKey]) {
+                    saddleDatabase[dept][pitKey][posIdx] = '';
+                }
+            }
+
+            // Remove from request queue if present
+            pendingRequests = pendingRequests.filter(r => r.id !== pendingYardPlacement.id);
+
+            // Reset Mode
+            pendingYardPlacement = null;
+            document.getElementById('placement-banner').style.display = 'none';
+
+            // Refresh All UI Screen Components seamlessly
+            changeSaddleDepartment();
+            renderReceiverSaddles();
+            renderQueue();
+            renderGrid();
+        }
+
+        // Handle Transfer Request (User Dispatches Request)
         function handleTransferRequest(e) {
             e.preventDefault();
             const coil = document.getElementById('req-coil-id').value.trim().toUpperCase();
@@ -485,7 +611,7 @@
             let detectedLocation = null;
             let saddleRef = null;
 
-            // 1. Search Exit Saddles
+            // Search Exit Saddles
             for (let dept in saddleDatabase) {
                 const p1 = saddleDatabase[dept].p1;
                 const p2 = saddleDatabase[dept].p2;
@@ -504,7 +630,7 @@
                 }
             }
 
-            // 2. Search Storage Yard Layout if not on Exit Saddle
+            // Search Storage Yard
             if (!detectedLocation) {
                 for (let yard in yardDatabase) {
                     for (let loc in yardDatabase[yard]) {
@@ -516,13 +642,12 @@
                 }
             }
 
-            // 3. REJECT IF LOCATION UNKNOWN
+            // Reject if location unknown
             if (!detectedLocation) {
-                alert(`TRANSFER REJECTED: Unknown Location!\n\nCoil [${coil}] is not found anywhere in the line exit saddles or yard storage layout.`);
+                document.getElementById('search-result-display').textContent = `REJECTED: Coil [${coil}] unknown location.`;
                 return;
             }
 
-            // Push to Queue
             pendingRequests.push({
                 id: Date.now(),
                 coil: coil,
@@ -533,7 +658,6 @@
 
             document.getElementById('req-coil-id').value = '';
             renderQueue();
-            alert(`Transfer Request Dispatched!\nCoil: ${coil}\nPickup Location: ${detectedLocation}\nTarget: ${destination}`);
         }
 
         // Render Crane Queue & User Monitor
@@ -585,30 +709,7 @@
             });
         }
 
-        // Complete Transfer and Clear Origin Saddle
-        function completeTransfer(reqId) {
-            const req = pendingRequests.find(r => r.id === reqId);
-            if (!req) return;
-
-            alert(`Coil ${req.coil} successfully picked up from [${req.from}] and delivered to [${req.to}].`);
-
-            // Auto-clear Saddle slot if originating from Exit Saddle
-            if (req.saddleOrigin) {
-                const { dept, pitKey, posIdx } = req.saddleOrigin;
-                if (saddleDatabase[dept] && saddleDatabase[dept][pitKey]) {
-                    saddleDatabase[dept][pitKey][posIdx] = '';
-                }
-            }
-
-            // Remove request
-            pendingRequests = pendingRequests.filter(r => r.id !== reqId);
-
-            changeSaddleDepartment();
-            renderReceiverSaddles();
-            renderQueue();
-        }
-
-        // Yard Grid Rendering
+        // Render Interactive Yard Grid Map
         function renderGrid() {
             const gridContainer = document.getElementById('grid-container');
             gridContainer.innerHTML = '';
@@ -624,6 +725,11 @@
                     const locId = `${col}${row}`;
                     const cell = document.createElement('div');
                     cell.className = 'grid-cell';
+                    cell.onclick = () => handleCellTap(locId);
+
+                    if (pendingYardPlacement) {
+                        cell.classList.add('placement-target');
+                    }
 
                     const currentYardData = yardDatabase[activeYard] || {};
                     const coilData = currentYardData[locId];
@@ -631,12 +737,12 @@
                     if (coilData) {
                         cell.classList.add('occupied');
                         cell.innerHTML = `
-                            <div class="cell-id">${coilData.heightName}</div>
+                            <div class="cell-id">${locId}</div>
                             <div class="cell-content">${coilData.coil}</div>
                             <div class="layer-badge">L${coilData.layer}</div>
                         `;
                     } else {
-                        cell.innerHTML = `<div class="cell-id">${locId}</div><div class="cell-content" style="color:#ccc;">Empty</div>`;
+                        cell.innerHTML = `<div class="cell-id">${locId}</div><div class="cell-content" style="color:#bbb;">Tap</div>`;
                     }
 
                     gridContainer.appendChild(cell);
@@ -688,7 +794,7 @@
                 for (let loc in yardDatabase[yard]) {
                     if (yardDatabase[yard][loc].coil === query) {
                         const locData = yardDatabase[yard][loc];
-                        resultDisplay.textContent = `FOUND: Yard [${yard}] -> Location Code: [${locData.heightName}] (Layer ${locData.layer})`;
+                        resultDisplay.textContent = `FOUND: Yard [${yard}] -> Location [${loc}] (Layer ${locData.layer})`;
                         switchYard(yard);
                         return;
                     }
