@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India Pune - Dynamic Yard Layer Filter System</title>
+    <title>AM/NS India Pune - Yard & Transfer Assurance System</title>
     <style>
         :root {
             --amns-red: #E30613;
@@ -115,6 +115,7 @@
         .task-route { font-size: 13px; color: var(--amns-dark); }
 
         .btn-pickup { background-color: var(--accent-green); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .btn-confirm { background-color: var(--accent-purple); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
         /* Yard Layout Grid Map */
         .yard-selector { display: flex; gap: 8px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
@@ -144,7 +145,6 @@
             transition: all 0.2s ease-in-out;
         }
         .grid-cell.read-only { cursor: default; }
-        .grid-cell.read-only:hover { transform: none; background: white; border-color: #B0BEC5; }
 
         .grid-cell.occupied-l1 { background-color: #E3F2FD; border: 1.5px solid var(--accent-blue); }
         .grid-cell.occupied-l2 { background-color: #FFF3CD; border: 1.5px solid var(--accent-orange); }
@@ -187,7 +187,7 @@
                 <div class="form-group" style="text-align:left;">
                     <label>Role Login:</label>
                     <select id="login-id" required>
-                        <option value="USER">USER (Process / Entry Line Operator)</option>
+                        <option value="USER">USER (Process / Line Operator)</option>
                         <option value="CRANE">RECEIVER (Crane Cabin Display)</option>
                     </select>
                 </div>
@@ -226,7 +226,7 @@
             <div class="logo-badge">AM/NS</div>
             <div>
                 <div class="app-title">AM/NS INDIA - PUNE FACILITY</div>
-                <div class="sub-title">Online Dynamic Exit Saddle & Interactive Yard Grid System</div>
+                <div class="sub-title">Online Exit Saddle, Yard Map & Return Assurance System</div>
             </div>
         </div>
 
@@ -259,23 +259,22 @@
                 <!-- Exit Saddles Panel -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span>Line Exit Saddles</span>
+                        <span>Line Exit Saddles (Coils Produced at Exit)</span>
                     </div>
 
+                    <!-- SPECIFIC EXIT LINE DROPDOWN -->
                     <div class="form-group">
-                        <label>Select Exit Line Department:</label>
+                        <label>Select Exit Line Area:</label>
                         <select id="saddle-dept-select" onchange="changeSaddleDepartment()">
                             <option value="CGL 1 EXIT">CGL 1 EXIT</option>
                             <option value="CGL 2 EXIT">CGL 2 EXIT</option>
-                            <option value="CRM 1 EXIT">CRM 1 EXIT</option>
-                            <option value="CRM 3 EXIT">CRM 3 EXIT</option>
                             <option value="CCL 1 EXIT">CCL 1 EXIT</option>
                             <option value="CCL 2 EXIT">CCL 2 EXIT</option>
-                            <option value="OFFLINE SKIN PASS EXIT">OFFLINE SKIN PASS EXIT</option>
-                            <option value="CRS LINE EXIT">CRS LINE EXIT</option>
-                            <option value="TRIMMER 1 EXIT">TRIMMER 1 EXIT</option>
-                            <option value="TRIMMER 2 EXIT">TRIMMER 2 EXIT</option>
-                            <option value="UK SLITTER EXIT">UK SLITTER EXIT</option>
+                            <option value="CRM 1 EXIT">CRM 1 EXIT</option>
+                            <option value="CRM 2 EXIT">CRM 2 EXIT</option>
+                            <option value="PICKLING 1 EXIT">PICKLING 1 EXIT</option>
+                            <option value="HOT ROLL 1 EXIT">HOT ROLL 1 EXIT</option>
+                            <option value="PACKING 1 EXIT">PACKING 1 EXIT</option>
                         </select>
                     </div>
 
@@ -324,10 +323,10 @@
                     </div>
                 </div>
 
-                <!-- Transfer Request Section -->
+                <!-- Entry Line Transfer Request Section -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span>Coil Entry Transfer Request</span>
+                        <span>Entry Line Coil Request (Coils Required at Production Entry)</span>
                     </div>
                     <form onsubmit="handleTransferRequest(event)">
                         <div class="form-group">
@@ -335,20 +334,19 @@
                             <input type="text" id="req-coil-id" placeholder="e.g. C-1001" required>
                         </div>
 
+                        <!-- SPECIFIC TARGET ENTRY LINE DROPDOWN -->
                         <div class="form-group">
-                            <label>Target Entry Department:</label>
+                            <label>Target Entry Line Area:</label>
                             <select id="req-destination" required>
                                 <option value="CGL 1 ENTRY">CGL 1 ENTRY</option>
                                 <option value="CGL 2 ENTRY">CGL 2 ENTRY</option>
-                                <option value="CRM 1 ENTRY">CRM 1 ENTRY</option>
-                                <option value="CRM 3 ENTRY">CRM 3 ENTRY</option>
                                 <option value="CCL 1 ENTRY">CCL 1 ENTRY</option>
                                 <option value="CCL 2 ENTRY">CCL 2 ENTRY</option>
-                                <option value="OFFLINE SKIN PASS ENTRY">OFFLINE SKIN PASS ENTRY</option>
-                                <option value="CRS LINE ENTRY">CRS LINE ENTRY</option>
-                                <option value="TRIMMER 1 ENTRY">TRIMMER 1 ENTRY</option>
-                                <option value="TRIMMER 2 ENTRY">TRIMMER 2 ENTRY</option>
-                                <option value="UK SLITTER ENTRY">UK SLITTER ENTRY</option>
+                                <option value="CRM 1 ENTRY">CRM 1 ENTRY</option>
+                                <option value="CRM 2 ENTRY">CRM 2 ENTRY</option>
+                                <option value="PICKLING 1 ENTRY">PICKLING 1 ENTRY</option>
+                                <option value="HOT ROLL 1 ENTRY">HOT ROLL 1 ENTRY</option>
+                                <option value="PACKING 1 ENTRY">PACKING 1 ENTRY</option>
                             </select>
                         </div>
 
@@ -358,11 +356,11 @@
 
             </div>
 
-            <!-- User Monitor & Read-Only Live Yard Dashboard -->
+            <!-- User Monitor & Return Assurance Notifications -->
             <div style="flex: 1; display:flex; flex-direction:column; gap:15px;">
                 <div class="panel">
                     <div class="panel-header">
-                        <span>Pending Transfer Requests Monitor</span>
+                        <span>Transfer Requests & Return Assurance Notifications</span>
                     </div>
                     <div id="user-status-container"></div>
                 </div>
@@ -371,16 +369,15 @@
                 <div class="panel" style="flex:1;">
                     <div class="panel-header">
                         <span>Live Storage Yard Overview (Read-Only)</span>
-                        <span style="font-size:11px; color:#6C757D; font-weight:normal;">Reflects Live Crane Movement</span>
                     </div>
 
                     <div class="yard-selector">
-                        <button class="yard-tab active" onclick="switchYardUser('CGL 1 PRIME')">CGL 1 PRIME</button>
-                        <button class="yard-tab" onclick="switchYardUser('CGL 2 PRIME')">CGL 2 PRIME</button>
-                        <button class="yard-tab" onclick="switchYardUser('CGL 1 REWORK')">CGL 1 REWORK</button>
-                        <button class="yard-tab" onclick="switchYardUser('CGL 2 REWORK')">CGL 2 REWORK</button>
-                        <button class="yard-tab" onclick="switchYardUser('CGL BABY COIL')">CGL BABY COIL</button>
-                        <button class="yard-tab" onclick="switchYardUser('CGL SCRAP')">CGL SCRAP</button>
+                        <button class="yard-tab active" onclick="switchYardUser('CGL AREA')">CGL AREA</button>
+                        <button class="yard-tab" onclick="switchYardUser('CRM AREA')">CRM AREA</button>
+                        <button class="yard-tab" onclick="switchYardUser('CCL AREA')">CCL AREA</button>
+                        <button class="yard-tab" onclick="switchYardUser('PICKLING AREA')">PICKLING AREA</button>
+                        <button class="yard-tab" onclick="switchYardUser('HOT ROLL COIL AREA')">HOT ROLL COIL AREA</button>
+                        <button class="yard-tab" onclick="switchYardUser('PACKING AREA')">PACKING AREA</button>
                     </div>
 
                     <div class="grid-container compact" id="user-grid-container"></div>
@@ -395,7 +392,7 @@
                 <!-- Section 1: Live Exit Saddles -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span>LIVE LINE EXIT SADDLES (COILS READY FOR PICKUP)</span>
+                        <span>LIVE LINE EXIT SADDLES (COILS PRODUCED READY FOR PICKUP TO YARD)</span>
                         <span id="saddle-badge" style="background:var(--accent-blue); color:white; padding:2px 8px; border-radius:10px; font-size:12px;">0 Placed</span>
                     </div>
                     <div id="receiver-saddle-container"></div>
@@ -404,7 +401,7 @@
                 <!-- Section 2: Crane Pending Transfer Queue -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span>ENTRY LINE TRANSFER REQUEST QUEUE</span>
+                        <span>ENTRY LINE TRANSFER REQUEST QUEUE (DELIVER COIL FROM YARD TO ENTRY)</span>
                         <span id="task-badge" style="background:var(--amns-red); color:white; padding:2px 8px; border-radius:10px; font-size:12px;">0 Pending</span>
                     </div>
                     <div id="crane-queue-container"></div>
@@ -431,12 +428,12 @@
 
                     <!-- Yard Section Selector -->
                     <div class="yard-selector">
-                        <button class="yard-tab active" onclick="switchYardCrane('CGL 1 PRIME')">CGL 1 PRIME</button>
-                        <button class="yard-tab" onclick="switchYardCrane('CGL 2 PRIME')">CGL 2 PRIME</button>
-                        <button class="yard-tab" onclick="switchYardCrane('CGL 1 REWORK')">CGL 1 REWORK</button>
-                        <button class="yard-tab" onclick="switchYardCrane('CGL 2 REWORK')">CGL 2 REWORK</button>
-                        <button class="yard-tab" onclick="switchYardCrane('CGL BABY COIL')">CGL BABY COIL</button>
-                        <button class="yard-tab" onclick="switchYardCrane('CGL SCRAP')">CGL SCRAP</button>
+                        <button class="yard-tab active" onclick="switchYardCrane('CGL AREA')">CGL AREA</button>
+                        <button class="yard-tab" onclick="switchYardCrane('CRM AREA')">CRM AREA</button>
+                        <button class="yard-tab" onclick="switchYardCrane('CCL AREA')">CCL AREA</button>
+                        <button class="yard-tab" onclick="switchYardCrane('PICKLING AREA')">PICKLING AREA</button>
+                        <button class="yard-tab" onclick="switchYardCrane('HOT ROLL COIL AREA')">HOT ROLL COIL AREA</button>
+                        <button class="yard-tab" onclick="switchYardCrane('PACKING AREA')">PACKING AREA</button>
                     </div>
 
                     <!-- MAP LAYER VIEW FILTER BUTTONS -->
@@ -458,8 +455,8 @@
 
     <script>
         let currentUserRole = null;
-        let activeYardCrane = 'CGL 1 PRIME';
-        let activeYardUser = 'CGL 1 PRIME';
+        let activeYardCrane = 'CGL AREA';
+        let activeYardUser = 'CGL AREA';
         let activeLayerFilter = 'ALL';
         let pendingYardPlacement = null; 
         let activeModalCellId = null;
@@ -468,38 +465,47 @@
         let undoStack = [];
         let redoStack = [];
 
-        // Exit Saddles Database
+        // Exit Saddles Database using Line Specific Names
         let saddleDatabase = {
             'CGL 1 EXIT': { p1: ['C-1001', 'C-1002', ''], p2: ['', '', ''] },
             'CGL 2 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'CRM 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'CRM 3 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
             'CCL 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
             'CCL 2 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'OFFLINE SKIN PASS EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'CRS LINE EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'TRIMMER 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'TRIMMER 2 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
-            'UK SLITTER EXIT': { p1: ['', '', ''], p2: ['', '', ''] }
+            'CRM 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
+            'CRM 2 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
+            'PICKLING 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
+            'HOT ROLL 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] },
+            'PACKING 1 EXIT': { p1: ['', '', ''], p2: ['', '', ''] }
         };
 
-        // Yard Database
+        // Storage Yard Database mapped to general area maps
         let yardDatabase = {
-            'CGL 1 PRIME': {
+            'CGL AREA': {
                 'A1': { layers: [{ layer: 1, coil: 'C-8010', namePattern: 'A1' }] },
-                'B2': { layers: [{ layer: 1, coil: 'C-8011', namePattern: 'B1' }, { layer: 2, coil: 'C-8015', namePattern: 'B2C2' }, { layer: 3, coil: 'C-9090', namePattern: 'B3C3D3' }] }
+                'B1': { layers: [{ layer: 1, coil: 'C-8011', namePattern: 'B1' }, { layer: 2, coil: 'C-8015', namePattern: 'B1C1' }, { layer: 3, coil: 'C-9090', namePattern: 'B1C1D1' }] }
             },
-            'CGL 2 PRIME': {},
-            'CGL 1 REWORK': {},
-            'CGL 2 REWORK': {},
-            'CGL BABY COIL': {},
-            'CGL SCRAP': {}
+            'CRM AREA': {},
+            'CCL AREA': {},
+            'PICKLING AREA': {},
+            'HOT ROLL COIL AREA': {},
+            'PACKING AREA': {}
         };
 
         // Pending Crane Transfer Requests
         let pendingRequests = [
-            { id: 1, coil: 'C-1001', from: 'CGL 1 EXIT (Pit 1 - Pos 1)', to: 'CGL 1 ENTRY', saddleOrigin: { dept: 'CGL 1 EXIT', pitKey: 'p1', posIdx: 0 } }
+            { id: 1, coil: 'C-1001', from: 'CGL 1 EXIT (Pit 1 - Pos 1)', to: 'CGL 1 ENTRY', status: 'PENDING_CRANE', saddleOrigin: { dept: 'CGL 1 EXIT', pitKey: 'p1', posIdx: 0 } }
         ];
+
+        // Maps Line specific names to their corresponding physical Yard Area
+        function mapLineToYardArea(lineName) {
+            if (lineName.includes('CGL')) return 'CGL AREA';
+            if (lineName.includes('CRM')) return 'CRM AREA';
+            if (lineName.includes('CCL')) return 'CCL AREA';
+            if (lineName.includes('PICKLING')) return 'PICKLING AREA';
+            if (lineName.includes('HOT ROLL')) return 'HOT ROLL COIL AREA';
+            if (lineName.includes('PACKING')) return 'PACKING AREA';
+            return 'CGL AREA';
+        }
 
         // SAVE STATE SNAPSHOT FOR UNDO/REDO
         function saveSnapshot() {
@@ -676,7 +682,7 @@
                             card.innerHTML = `
                                 <div class="task-info">
                                     <div class="task-coil" style="color:#007BFF;">COIL: ${coil}</div>
-                                    <div class="task-route"><strong>SADDLE LOCATION:</strong> ${dept} (${pitName} - Pos ${idx + 1})</div>
+                                    <div class="task-route"><strong>EXIT SADDLE LOCATION:</strong> ${dept} (${pitName} - Pos ${idx + 1})</div>
                                 </div>
                                 <button class="btn-pickup" onclick="cranePickupDirect('${dept}', '${pitKey}', ${idx}, '${coil}')">Pick Up to Yard</button>
                             `;
@@ -688,7 +694,7 @@
 
             badge.textContent = `${count} Placed`;
             if (count === 0) {
-                receiverContainer.innerHTML = `<div style="text-align:center; color:#888; padding:10px;">No coils currently placed on line exit saddles.</div>`;
+                receiverContainer.innerHTML = `<div style="text-align:center; color:#888; padding:10px;">No coils currently placed on exit saddles.</div>`;
             }
         }
 
@@ -699,6 +705,9 @@
                 saddleOrigin: { dept, pitKey, posIdx }
             };
 
+            // Dynamic yard view switch based on exit line
+            const targetYardArea = mapLineToYardArea(dept);
+            switchYardCrane(targetYardArea);
             activateYardPlacementMode();
         }
 
@@ -713,6 +722,7 @@
             document.getElementById('yard-grid-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // CRANE MARKS TRANSFER COMPLETED -> SENDS RETURN ASSURANCE NOTIFICATION TO USER
         function completeEntryTransfer(reqId) {
             const req = pendingRequests.find(r => r.id === reqId);
             if (!req) return;
@@ -726,13 +736,28 @@
                 }
             }
 
-            pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+            req.status = 'PENDING_USER_CONFIRMATION';
 
-            document.getElementById('search-result-display').textContent = `DELIVERED: Coil [${req.coil}] sent directly to [${req.to}].`;
+            document.getElementById('search-result-display').textContent = `CRANE MOVED: Coil [${req.coil}] delivered to Entry [${req.to}]. Awaiting User Return Assurance Confirmation.`;
 
             refreshAllViews();
         }
 
+        // USER CONFIRMS PHYSICAL RECEIPT (RETURN ASSURANCE)
+        function confirmUserArrival(reqId) {
+            const req = pendingRequests.find(r => r.id === reqId);
+            if (!req) return;
+
+            saveSnapshot();
+
+            pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+
+            document.getElementById('search-result-display').textContent = `CONFIRMED: Operation confirmed for Coil [${req.coil}] at [${req.to}].`;
+
+            refreshAllViews();
+        }
+
+        // LAYER SELECTION FILTER - ALSO LOCKS PLACEMENT DROPDOWN LEVEL
         function setLayerFilter(layer) {
             activeLayerFilter = layer;
 
@@ -741,10 +766,17 @@
             document.getElementById('btn-layer-2').className = 'layer-tab-btn' + (layer === 2 ? ' active-layer-2' : '');
             document.getElementById('btn-layer-3').className = 'layer-tab-btn' + (layer === 3 ? ' active-layer-3' : '');
 
+            // SYNC PLACEMENT SELECT BOX TO MATCH ACTIVE MAP FILTER
+            const layerOptSelect = document.getElementById('selected-layer-opt');
+            if (layerOptSelect && layer !== 'ALL') {
+                layerOptSelect.value = layer.toString();
+            }
+
             renderCraneGrid();
+            renderUserGrid();
         }
 
-        // GENERATE PATTERN NAME BASED ON CELL AND SELECTED LAYER
+        // GENERATE LAYER-SPECIFIC NAME FORMAT (L1: A1, L2: A1B1, L3: A1B1C1)
         function getPatternName(baseCellId, targetLayer) {
             const col = baseCellId.charAt(0);
             const row = baseCellId.slice(1);
@@ -753,11 +785,11 @@
                 return `${col}${row}`;
             } else if (targetLayer === 2) {
                 const nextCol = String.fromCharCode(col.charCodeAt(0) + 1);
-                return `${col}2${nextCol}2`;
+                return `${col}${row}${nextCol}${row}`;
             } else if (targetLayer === 3) {
                 const nextCol1 = String.fromCharCode(col.charCodeAt(0) + 1);
                 const nextCol2 = String.fromCharCode(col.charCodeAt(0) + 2);
-                return `${col}3${nextCol1}3${nextCol2}3`;
+                return `${col}${row}${nextCol1}${row}${nextCol2}${row}`;
             }
             return baseCellId;
         }
@@ -768,9 +800,15 @@
                 saveSnapshot();
 
                 const targetCoil = pendingYardPlacement.coil;
-                // Explicitly pull layer from selection drop-down
-                const layerSelect = document.getElementById('selected-layer-opt');
-                const selectedLayer = parseInt(layerSelect.value, 10);
+                
+                // PRESERVE SELECTED LAYER (USES ACTIVE MAP LAYER IF SET TO L1, L2, OR L3)
+                let selectedLayer = 1;
+                if (activeLayerFilter !== 'ALL') {
+                    selectedLayer = parseInt(activeLayerFilter, 10);
+                } else {
+                    const layerSelect = document.getElementById('selected-layer-opt');
+                    selectedLayer = parseInt(layerSelect.value, 10);
+                }
 
                 if (!yardDatabase[activeYardCrane]) yardDatabase[activeYardCrane] = {};
                 if (!yardDatabase[activeYardCrane][baseCellId]) yardDatabase[activeYardCrane][baseCellId] = { layers: [] };
@@ -806,7 +844,7 @@
             }
         }
 
-        // INSPECT & EDIT CELL MODAL
+        // INSPECT & EDIT CELL MODAL (STRICT 3 LAYERS)
         function openCellModal(baseCellId) {
             activeModalCellId = baseCellId;
             const cellData = yardDatabase[activeYardCrane]?.[baseCellId];
@@ -821,11 +859,12 @@
             [1, 2, 3].forEach(lNum => {
                 const layerObj = layers.find(l => l.layer === lNum);
                 const layerVal = layerObj ? layerObj.coil : '';
+                const layerPatternName = getPatternName(baseCellId, lNum);
 
                 const row = document.createElement('div');
                 row.className = 'form-group';
                 row.innerHTML = `
-                    <label>Layer ${lNum} Coil Number:</label>
+                    <label>Layer ${lNum} (${layerPatternName}) Coil Number:</label>
                     <div style="display:flex; gap:6px;">
                         <input type="text" id="modal-layer-${lNum}" value="${layerVal}" placeholder="Empty Layer ${lNum}">
                         <button style="background:#DC3545; color:white; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('modal-layer-${lNum}').value=''">Clear</button>
@@ -870,11 +909,13 @@
         function handleTransferRequest(e) {
             e.preventDefault();
             const coil = document.getElementById('req-coil-id').value.trim().toUpperCase();
-            const destination = document.getElementById('req-destination').value;
+            const destinationEntryArea = document.getElementById('req-destination').value;
 
             let detectedLocation = null;
             let saddleRef = null;
+            let originYardArea = null;
 
+            // Search Exit Saddles
             for (let dept in saddleDatabase) {
                 const p1 = saddleDatabase[dept].p1;
                 const p2 = saddleDatabase[dept].p2;
@@ -883,16 +924,19 @@
                     const idx = p1.indexOf(coil);
                     detectedLocation = `${dept} (Pit 1 - Pos ${idx + 1})`;
                     saddleRef = { dept: dept, pitKey: 'p1', posIdx: idx };
+                    originYardArea = mapLineToYardArea(dept);
                     break;
                 }
                 if (p2.includes(coil)) {
                     const idx = p2.indexOf(coil);
                     detectedLocation = `${dept} (Pit 2 - Pos ${idx + 1})`;
                     saddleRef = { dept: dept, pitKey: 'p2', posIdx: idx };
+                    originYardArea = mapLineToYardArea(dept);
                     break;
                 }
             }
 
+            // Search Yard Database
             if (!detectedLocation) {
                 for (let yard in yardDatabase) {
                     for (let loc in yardDatabase[yard]) {
@@ -900,6 +944,7 @@
                         const found = layers.find(l => l.coil === coil);
                         if (found) {
                             detectedLocation = `Yard: ${yard} [${found.namePattern}] (Layer ${found.layer})`;
+                            originYardArea = yard;
                             break;
                         }
                     }
@@ -907,7 +952,7 @@
             }
 
             if (!detectedLocation) {
-                document.getElementById('search-result-display').textContent = `REJECTED: Coil [${coil}] unknown location.`;
+                document.getElementById('search-result-display').textContent = `REJECTED: Coil [${coil}] unknown location in system.`;
                 return;
             }
 
@@ -917,9 +962,16 @@
                 id: Date.now(),
                 coil: coil,
                 from: detectedLocation,
-                to: destination,
-                saddleOrigin: saddleRef
+                to: destinationEntryArea,
+                status: 'PENDING_CRANE',
+                saddleOrigin: saddleRef,
+                originYardArea: originYardArea
             });
+
+            // AUTOMATICALLY SWITCH MAP TO REQUEST SOURCE YARD LOCATION
+            if (originYardArea) {
+                switchYardCrane(originYardArea);
+            }
 
             document.getElementById('req-coil-id').value = '';
             refreshAllViews();
@@ -935,43 +987,65 @@
             craneContainer.innerHTML = '';
             userMonitor.innerHTML = '';
 
-            badge.textContent = `${pendingRequests.length} Pending`;
+            const craneTasks = pendingRequests.filter(r => r.status === 'PENDING_CRANE');
+            badge.textContent = `${craneTasks.length} Pending`;
+
+            if (craneTasks.length === 0) {
+                craneContainer.innerHTML = `<div style="text-align:center; color:#888; padding:15px;">No pending entry transfer requests in crane queue.</div>`;
+            } else {
+                craneTasks.forEach(req => {
+                    const card = document.createElement('div');
+                    card.className = 'task-card';
+                    card.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-coil">COIL: ${req.coil}</div>
+                            <div class="task-route"><strong>PICKUP SOURCE:</strong> ${req.from}</div>
+                            <div class="task-route"><strong>DELIVER TO ENTRY:</strong> ${req.to}</div>
+                        </div>
+                        <button class="btn-pickup" onclick="completeEntryTransfer(${req.id})">Complete Transfer to Entry</button>
+                    `;
+                    craneContainer.appendChild(card);
+                });
+            }
 
             if (pendingRequests.length === 0) {
-                craneContainer.innerHTML = `<div style="text-align:center; color:#888; padding:15px;">No pending transfer requests in crane queue.</div>`;
                 userMonitor.innerHTML = `<div style="text-align:center; color:#888; padding:15px;">No active dispatched requests.</div>`;
                 return;
             }
 
+            // USER MONITOR & RETURN ASSURANCE NOTIFICATIONS
             pendingRequests.forEach(req => {
-                const card = document.createElement('div');
-                card.className = 'task-card';
-                card.innerHTML = `
-                    <div class="task-info">
-                        <div class="task-coil">COIL: ${req.coil}</div>
-                        <div class="task-route"><strong>PICKUP LOCATION:</strong> ${req.from}</div>
-                        <div class="task-route"><strong>TARGET ENTRY:</strong> ${req.to}</div>
-                    </div>
-                    <button class="btn-pickup" onclick="completeEntryTransfer(${req.id})">Complete Transfer to Entry</button>
-                `;
-                craneContainer.appendChild(card);
-
                 const userCard = document.createElement('div');
                 userCard.className = 'task-card';
-                userCard.style.borderLeftColor = '#007BFF';
-                userCard.innerHTML = `
-                    <div class="task-info">
-                        <div class="task-coil" style="color:#007BFF;">COIL: ${req.coil}</div>
-                        <div class="task-route"><strong>DETECTED AT:</strong> ${req.from}</div>
-                        <div class="task-route"><strong>DESTINATION:</strong> ${req.to}</div>
-                        <div style="font-size:11px; color:#28A745; font-weight:bold;">Status: Pending Crane Movement</div>
-                    </div>
-                `;
+
+                if (req.status === 'PENDING_USER_CONFIRMATION') {
+                    userCard.style.borderLeftColor = '#28A745';
+                    userCard.style.background = '#E8F5E9';
+                    userCard.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-coil" style="color:#28A745;">COIL: ${req.coil} (Awaiting Your Confirmation)</div>
+                            <div class="task-route"><strong>ORIGIN:</strong> ${req.from}</div>
+                            <div class="task-route"><strong>DELIVERED TO ENTRY:</strong> ${req.to}</div>
+                            <div style="font-size:11px; color:#28A745; font-weight:bold;">Status: Crane Completed Transfer - Confirm Arrival</div>
+                        </div>
+                        <button class="btn-confirm" onclick="confirmUserArrival(${req.id})">✓ Confirm Arrival / Reality Check</button>
+                    `;
+                } else {
+                    userCard.style.borderLeftColor = '#007BFF';
+                    userCard.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-coil" style="color:#007BFF;">COIL: ${req.coil}</div>
+                            <div class="task-route"><strong>SOURCE LOCATION:</strong> ${req.from}</div>
+                            <div class="task-route"><strong>TARGET ENTRY:</strong> ${req.to}</div>
+                            <div style="font-size:11px; color:#FD7E14; font-weight:bold;">Status: In Transit / Crane In Progress</div>
+                        </div>
+                    `;
+                }
                 userMonitor.appendChild(userCard);
             });
         }
 
-        // RENDER INTERACTIVE CRANE YARD GRID MAP
+        // RENDER INTERACTIVE CRANE YARD GRID MAP WITH EXACT LAYER-SPECIFIC LABELS
         function renderCraneGrid() {
             const gridContainer = document.getElementById('crane-grid-container');
             if (!gridContainer) return;
@@ -998,17 +1072,17 @@
 
                     let displayCoilObj = null;
                     if (activeLayerFilter === 'ALL') {
-                        displayCoilObj = layersArr[layersArr.length - 1]; // Highest layer available
+                        displayCoilObj = layersArr[layersArr.length - 1]; // Highest available layer
                     } else {
                         displayCoilObj = layersArr.find(l => l.layer === activeLayerFilter);
                     }
 
-                    // Dynamic Base Pattern Label according to active Layer Filter View
+                    // Strict Layer-Based Display Pattern Name (A1, A1B1, A1B1C1)
                     let cellDisplayLabel = locId;
                     if (activeLayerFilter === 2) {
-                        cellDisplayLabel = `${col}2`;
+                        cellDisplayLabel = getPatternName(locId, 2);
                     } else if (activeLayerFilter === 3) {
-                        cellDisplayLabel = `${col}3`;
+                        cellDisplayLabel = getPatternName(locId, 3);
                     }
 
                     if (displayCoilObj) {
@@ -1016,7 +1090,7 @@
                         cell.innerHTML = `
                             <div class="cell-id">${displayCoilObj.namePattern}</div>
                             <div class="cell-content">${displayCoilObj.coil}</div>
-                            <div class="layer-badge-${displayCoilObj.layer}">L${displayCoilObj.layer} (${layersArr.length} Staked)</div>
+                            <div class="layer-badge-${displayCoilObj.layer}">L${displayCoilObj.layer} (${layersArr.length} Stacked)</div>
                         `;
                     } else {
                         cell.innerHTML = `<div class="cell-id">${cellDisplayLabel}</div><div class="cell-content" style="color:#ccc;">Empty</div>`;
@@ -1027,7 +1101,7 @@
             });
         }
 
-        // RENDER READ-ONLY USER YARD DASHBOARD
+        // RENDER READ-ONLY USER YARD DASHBOARD WITH EXACT LAYER-SPECIFIC LABELS
         function renderUserGrid() {
             const gridContainer = document.getElementById('user-grid-container');
             if (!gridContainer) return;
@@ -1048,7 +1122,20 @@
 
                     const cellData = yardDatabase[activeYardUser]?.[locId];
                     const layersArr = cellData?.layers || [];
-                    const displayCoilObj = layersArr[layersArr.length - 1]; 
+                    
+                    let displayCoilObj = null;
+                    if (activeLayerFilter === 'ALL') {
+                        displayCoilObj = layersArr[layersArr.length - 1]; 
+                    } else {
+                        displayCoilObj = layersArr.find(l => l.layer === activeLayerFilter);
+                    }
+
+                    let cellDisplayLabel = locId;
+                    if (activeLayerFilter === 2) {
+                        cellDisplayLabel = getPatternName(locId, 2);
+                    } else if (activeLayerFilter === 3) {
+                        cellDisplayLabel = getPatternName(locId, 3);
+                    }
 
                     if (displayCoilObj) {
                         cell.classList.add(`occupied-l${displayCoilObj.layer}`);
@@ -1058,7 +1145,7 @@
                             <div class="layer-badge-${displayCoilObj.layer}">L${displayCoilObj.layer}</div>
                         `;
                     } else {
-                        cell.innerHTML = `<div class="cell-id">${locId}</div><div class="cell-content" style="color:#ccc;">Empty</div>`;
+                        cell.innerHTML = `<div class="cell-id">${cellDisplayLabel}</div><div class="cell-content" style="color:#ccc;">Empty</div>`;
                     }
 
                     gridContainer.appendChild(cell);
