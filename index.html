@@ -78,13 +78,13 @@
 
         .btn-submit { background-color: var(--amns-red); color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
         
-        /* Work Queue Cards */
+        /* Work Cards */
         .task-card { border-left: 5px solid var(--amns-red); background: #FFF5F5; padding: 12px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .task-info { display: flex; flex-direction: column; gap: 4px; }
         .task-coil { font-size: 18px; font-weight: bold; color: var(--amns-red); }
         .task-route { font-size: 13px; color: var(--amns-dark); }
 
-        .btn-complete { background-color: var(--accent-green); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .btn-pickup { background-color: var(--accent-green); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
         /* Grid Map */
         .yard-selector { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; }
@@ -135,7 +135,7 @@
             <div class="logo-badge">AM/NS</div>
             <div>
                 <div class="app-title">AM/NS INDIA - PUNE FACILITY</div>
-                <div class="sub-title">Online Dynamic Dynamic Saddle & Crane Dispatch System</div>
+                <div class="sub-title">Online Dynamic Exit Saddle & Entry Dispatch System</div>
             </div>
         </div>
 
@@ -229,10 +229,10 @@
                     </div>
                 </div>
 
-                <!-- Transfer Request Section (Entry Line Operators) -->
+                <!-- Transfer Request Section (Restricted Strictly to Department Entry Options) -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span>Coil Transfer Request (Entry / Yard)</span>
+                        <span>Coil Entry Transfer Request</span>
                     </div>
                     <form onsubmit="handleTransferRequest(event)">
                         <div class="form-group">
@@ -241,33 +241,23 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Target Destination (Line / Yard):</label>
+                            <label>Target Entry Department:</label>
                             <select id="req-destination" required>
-                                <optgroup label="Entry Departments">
-                                    <option value="CGL 1 ENTRY">CGL 1 ENTRY</option>
-                                    <option value="CGL 2 ENTRY">CGL 2 ENTRY</option>
-                                    <option value="CRM 1 ENTRY">CRM 1 ENTRY</option>
-                                    <option value="CRM 3 ENTRY">CRM 3 ENTRY</option>
-                                    <option value="CCL 1 ENTRY">CCL 1 ENTRY</option>
-                                    <option value="CCL 2 ENTRY">CCL 2 ENTRY</option>
-                                    <option value="OFFLINE SKIN PASS ENTRY">OFFLINE SKIN PASS ENTRY</option>
-                                    <option value="CRS LINE ENTRY">CRS LINE ENTRY</option>
-                                    <option value="TRIMMER 1 ENTRY">TRIMMER 1 ENTRY</option>
-                                    <option value="TRIMMER 2 ENTRY">TRIMMER 2 ENTRY</option>
-                                    <option value="UK SLITTER ENTRY">UK SLITTER ENTRY</option>
-                                </optgroup>
-                                <optgroup label="Storage Yards">
-                                    <option value="CGL 1 PRIME">CGL 1 PRIME</option>
-                                    <option value="CGL 2 PRIME">CGL 2 PRIME</option>
-                                    <option value="CGL 1 REWORK">CGL 1 REWORK</option>
-                                    <option value="CGL 2 REWORK">CGL 2 REWORK</option>
-                                    <option value="CGL BABY COIL">CGL BABY COIL</option>
-                                    <option value="CGL SCRAP">CGL SCRAP</option>
-                                </optgroup>
+                                <option value="CGL 1 ENTRY">CGL 1 ENTRY</option>
+                                <option value="CGL 2 ENTRY">CGL 2 ENTRY</option>
+                                <option value="CRM 1 ENTRY">CRM 1 ENTRY</option>
+                                <option value="CRM 3 ENTRY">CRM 3 ENTRY</option>
+                                <option value="CCL 1 ENTRY">CCL 1 ENTRY</option>
+                                <option value="CCL 2 ENTRY">CCL 2 ENTRY</option>
+                                <option value="OFFLINE SKIN PASS ENTRY">OFFLINE SKIN PASS ENTRY</option>
+                                <option value="CRS LINE ENTRY">CRS LINE ENTRY</option>
+                                <option value="TRIMMER 1 ENTRY">TRIMMER 1 ENTRY</option>
+                                <option value="TRIMMER 2 ENTRY">TRIMMER 2 ENTRY</option>
+                                <option value="UK SLITTER ENTRY">UK SLITTER ENTRY</option>
                             </select>
                         </div>
 
-                        <button type="submit" class="btn-submit">Dispatch Transfer Request to Crane</button>
+                        <button type="submit" class="btn-submit">Dispatch Request to Crane</button>
                     </form>
                 </div>
 
@@ -277,27 +267,36 @@
             <div style="flex: 1;">
                 <div class="panel">
                     <div class="panel-header">
-                        <span>Pending Crane Transfers Monitor</span>
+                        <span>Pending Transfer Requests Monitor</span>
                     </div>
                     <div id="user-status-container"></div>
                 </div>
             </div>
         </div>
 
-        <!-- CRANE OPERATOR WORKSPACE -->
+        <!-- CRANE OPERATOR WORKSPACE (RECEIVER) -->
         <div id="receiver-workspace" class="workspace hidden">
-            <div style="flex: 1; display:flex; flex-direction:column;">
+            <div style="flex: 1; display:flex; flex-direction:column; gap:15px;">
                 
-                <!-- Crane Pending Requests -->
+                <!-- Section 1: Live Exit Saddles with Pickup Buttons -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span>CRANE CABIN DISPATCH QUEUE</span>
+                        <span>LIVE LINE EXIT SADDLES (COILS READY FOR PICKUP)</span>
+                        <span id="saddle-badge" style="background:var(--accent-blue); color:white; padding:2px 8px; border-radius:10px; font-size:12px;">0 Placed</span>
+                    </div>
+                    <div id="receiver-saddle-container"></div>
+                </div>
+
+                <!-- Section 2: Crane Pending Transfer Queue -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span>ENTRY LINE TRANSFER REQUEST QUEUE</span>
                         <span id="task-badge" style="background:var(--amns-red); color:white; padding:2px 8px; border-radius:10px; font-size:12px;">0 Pending</span>
                     </div>
                     <div id="crane-queue-container"></div>
                 </div>
 
-                <!-- Interactive Yard Map -->
+                <!-- Section 3: Storage Yard Grid Map -->
                 <div class="panel" style="flex:1;">
                     <div class="panel-header">
                         <span>Storage Yard Layout Grid Map</span>
@@ -352,7 +351,7 @@
             'CGL SCRAP': {}
         };
 
-        // Pending Crane Transfer Orders
+        // Pending Crane Transfer Requests
         let pendingRequests = [
             { id: 1, coil: 'C-1001', from: 'CGL 1 EXIT (Pit 1 - Pos 1)', to: 'CGL 1 ENTRY', saddleOrigin: { dept: 'CGL 1 EXIT', pitKey: 'p1', posIdx: 0 } }
         ];
@@ -385,6 +384,7 @@
 
             renderGrid();
             renderQueue();
+            renderReceiverSaddles();
             changeSaddleDepartment();
         }
 
@@ -421,20 +421,71 @@
             }
 
             saddleDatabase[dept][pit][posIndex] = val;
-            alert(`Coil [${val}] registered at ${dept} (${pit.toUpperCase()} - Pos ${posIndex + 1}).`);
+            alert(`Coil [${val}] placed on ${dept} (${pit.toUpperCase()} - Pos ${posIndex + 1}). Updated on Receiver Screen.`);
+            
+            renderReceiverSaddles();
         }
 
-        // Submit Transfer Request (Automated Pickup Finder)
+        // Render Live Exit Saddles for Receiver/Crane Display
+        function renderReceiverSaddles() {
+            const receiverContainer = document.getElementById('receiver-saddle-container');
+            const badge = document.getElementById('saddle-badge');
+            if (!receiverContainer) return;
+
+            receiverContainer.innerHTML = '';
+            let count = 0;
+
+            for (let dept in saddleDatabase) {
+                ['p1', 'p2'].forEach(pitKey => {
+                    const pitName = pitKey === 'p1' ? 'Pit 1' : 'Pit 2';
+                    saddleDatabase[dept][pitKey].forEach((coil, idx) => {
+                        if (coil) {
+                            count++;
+                            const card = document.createElement('div');
+                            card.className = 'task-card';
+                            card.style.borderLeftColor = '#007BFF';
+                            card.innerHTML = `
+                                <div class="task-info">
+                                    <div class="task-coil" style="color:#007BFF;">COIL: ${coil}</div>
+                                    <div class="task-route"><strong>SADDLE LOCATION:</strong> ${dept} (${pitName} - Pos ${idx + 1})</div>
+                                </div>
+                                <button class="btn-pickup" onclick="cranePickupDirect('${dept}', '${pitKey}', ${idx}, '${coil}')">Pick Up</button>
+                            `;
+                            receiverContainer.appendChild(card);
+                        }
+                    });
+                });
+            }
+
+            badge.textContent = `${count} Placed`;
+            if (count === 0) {
+                receiverContainer.innerHTML = `<div style="text-align:center; color:#888; padding:10px;">No coils currently placed on line exit saddles.</div>`;
+            }
+        }
+
+        // Direct Crane Pick Up from Exit Saddle
+        function cranePickupDirect(dept, pitKey, posIdx, coil) {
+            const targetEntry = prompt(`DIRECT PICKUP: Coil [${coil}]\nEnter Target Entry Department for Transfer (e.g. CGL 1 ENTRY, CRM 1 ENTRY):`, "CGL 1 ENTRY");
+            if (!targetEntry) return;
+
+            // Clear saddle slot
+            saddleDatabase[dept][pitKey][posIdx] = '';
+            alert(`Coil ${coil} picked up from ${dept} and successfully delivered to ${targetEntry}. Saddle position cleared.`);
+
+            changeSaddleDepartment();
+            renderReceiverSaddles();
+        }
+
+        // Handle Transfer Request (With Auto-Detection & Unknown Location Rejection)
         function handleTransferRequest(e) {
             e.preventDefault();
             const coil = document.getElementById('req-coil-id').value.trim().toUpperCase();
             const destination = document.getElementById('req-destination').value;
 
-            // Auto-detect coil location
-            let detectedLocation = "Unknown / Yard Pickup";
+            let detectedLocation = null;
             let saddleRef = null;
 
-            // Search Saddles
+            // 1. Search Exit Saddles
             for (let dept in saddleDatabase) {
                 const p1 = saddleDatabase[dept].p1;
                 const p2 = saddleDatabase[dept].p2;
@@ -453,8 +504,8 @@
                 }
             }
 
-            // Search Yards if not on saddle
-            if (!saddleRef) {
+            // 2. Search Storage Yard Layout if not on Exit Saddle
+            if (!detectedLocation) {
                 for (let yard in yardDatabase) {
                     for (let loc in yardDatabase[yard]) {
                         if (yardDatabase[yard][loc].coil === coil) {
@@ -465,7 +516,13 @@
                 }
             }
 
-            // Push to Crane Queue
+            // 3. REJECT IF LOCATION UNKNOWN
+            if (!detectedLocation) {
+                alert(`TRANSFER REJECTED: Unknown Location!\n\nCoil [${coil}] is not found anywhere in the line exit saddles or yard storage layout.`);
+                return;
+            }
+
+            // Push to Queue
             pendingRequests.push({
                 id: Date.now(),
                 coil: coil,
@@ -476,7 +533,7 @@
 
             document.getElementById('req-coil-id').value = '';
             renderQueue();
-            alert(`Transfer Request Dispatched to Crane for Coil ${coil}`);
+            alert(`Transfer Request Dispatched!\nCoil: ${coil}\nPickup Location: ${detectedLocation}\nTarget: ${destination}`);
         }
 
         // Render Crane Queue & User Monitor
@@ -493,32 +550,34 @@
             badge.textContent = `${pendingRequests.length} Pending`;
 
             if (pendingRequests.length === 0) {
-                craneContainer.innerHTML = `<div style="text-align:center; color:#888; padding:15px;">No pending work orders in crane queue.</div>`;
+                craneContainer.innerHTML = `<div style="text-align:center; color:#888; padding:15px;">No pending transfer requests in crane queue.</div>`;
                 userMonitor.innerHTML = `<div style="text-align:center; color:#888; padding:15px;">No active dispatched requests.</div>`;
                 return;
             }
 
             pendingRequests.forEach(req => {
-                // Crane Card
+                // Crane Display Card
                 const card = document.createElement('div');
                 card.className = 'task-card';
                 card.innerHTML = `
                     <div class="task-info">
                         <div class="task-coil">COIL: ${req.coil}</div>
-                        <div class="task-route"><strong>PICKUP:</strong> ${req.from} &nbsp;➔&nbsp; <strong>DROP:</strong> ${req.to}</div>
+                        <div class="task-route"><strong>PICKUP LOCATION:</strong> ${req.from}</div>
+                        <div class="task-route"><strong>TARGET ENTRY:</strong> ${req.to}</div>
                     </div>
-                    <button class="btn-complete" onclick="completeTransfer(${req.id})">Place & Complete</button>
+                    <button class="btn-pickup" onclick="completeTransfer(${req.id})">Complete Transfer</button>
                 `;
                 craneContainer.appendChild(card);
 
-                // User Monitor Card
+                // User Display Card
                 const userCard = document.createElement('div');
                 userCard.className = 'task-card';
                 userCard.style.borderLeftColor = '#007BFF';
                 userCard.innerHTML = `
                     <div class="task-info">
                         <div class="task-coil" style="color:#007BFF;">COIL: ${req.coil}</div>
-                        <div class="task-route"><strong>ROUTE:</strong> ${req.from} ➔ ${req.to}</div>
+                        <div class="task-route"><strong>DETECTED AT:</strong> ${req.from}</div>
+                        <div class="task-route"><strong>DESTINATION:</strong> ${req.to}</div>
                         <div style="font-size:11px; color:#28A745; font-weight:bold;">Status: Pending Crane Movement</div>
                     </div>
                 `;
@@ -526,34 +585,14 @@
             });
         }
 
-        // Crane Completes Request & Assigns Yard Grid Location
+        // Complete Transfer and Clear Origin Saddle
         function completeTransfer(reqId) {
             const req = pendingRequests.find(r => r.id === reqId);
             if (!req) return;
 
-            if (req.to.includes('ENTRY')) {
-                alert(`Coil ${req.coil} successfully delivered to Entry Line: ${req.to}`);
-            } else {
-                // Yard Destination Placement
-                const yardName = req.to;
-                const baseCell = prompt(`CRANE PLACEMENT CONFIRMATION:\nPlacing Coil [${req.coil}] into Yard [${yardName}].\n\nEnter Grid Location Cell (e.g., A1, B2, C3):`, "A1");
+            alert(`Coil ${req.coil} successfully picked up from [${req.from}] and delivered to [${req.to}].`);
 
-                if (!baseCell) return;
-                const cleanedCell = baseCell.trim().toUpperCase();
-
-                if (!yardDatabase[yardName]) yardDatabase[yardName] = {};
-                yardDatabase[yardName][cleanedCell] = {
-                    coil: req.coil,
-                    layer: 1,
-                    heightName: cleanedCell
-                };
-
-                activeYard = yardName;
-                renderGrid();
-                alert(`Coil ${req.coil} placed into Yard [${yardName}] at position [${cleanedCell}].`);
-            }
-
-            // AUTO-CLEAR SADDLE SLOT IF PICKED FROM EXIT SADDLE
+            // Auto-clear Saddle slot if originating from Exit Saddle
             if (req.saddleOrigin) {
                 const { dept, pitKey, posIdx } = req.saddleOrigin;
                 if (saddleDatabase[dept] && saddleDatabase[dept][pitKey]) {
@@ -561,10 +600,11 @@
                 }
             }
 
-            // Remove from queue
+            // Remove request
             pendingRequests = pendingRequests.filter(r => r.id !== reqId);
-            
+
             changeSaddleDepartment();
+            renderReceiverSaddles();
             renderQueue();
         }
 
