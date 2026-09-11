@@ -105,7 +105,7 @@
         .grid-header, .row-label { background: var(--amns-dark); color: white; text-align: center; padding: 6px 0; font-weight: bold; font-size: 12px; border-radius: 3px; }
         
         .grid-cell { 
-            background: white; border: 2px dashed #B0BEC5; min-height: 60px; border-radius: 5px; padding: 4px; 
+            background: white; border: 2px dashed #B0BEC5; min-height: 65px; border-radius: 5px; padding: 4px; 
             display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;
             transition: all 0.2s ease-in-out;
         }
@@ -133,7 +133,10 @@
         .layer-badge { align-self: flex-end; font-size: 8px; background: var(--amns-red); color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; }
 
         .placement-banner {
-            background-color: #007BFF; color: white; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-bottom: 10px; text-align: center; display: none;
+            background-color: #007BFF; color: white; padding: 10px 14px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; align-items: center; justify-content: space-between;
+        }
+        .layer-select-box {
+            background: white; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;
         }
     </style>
 </head>
@@ -313,7 +316,7 @@
         <!-- CRANE OPERATOR WORKSPACE -->
         <div id="receiver-workspace" class="workspace hidden">
             <div style="flex: 1; display:flex; flex-direction:column; gap:15px;">
-                
+
                 <!-- Section 1: Live Exit Saddles -->
                 <div class="panel">
                     <div class="panel-header">
@@ -333,14 +336,22 @@
                 </div>
 
                 <!-- Section 3: Interactive Storage Yard Grid Map -->
-                <div class="panel" style="flex:1;">
+                <div class="panel" id="yard-grid-panel" style="flex:1;">
                     <div class="panel-header">
                         <span>Storage Yard Layout Grid Map</span>
                     </div>
 
-                    <!-- Placement Mode Instruction Banner -->
+                    <!-- Placement Mode Instruction Banner & Layer Options -->
                     <div id="placement-banner" class="placement-banner">
-                        👇 TAP ANY CELL ON THE MAP BELOW TO STORE COIL [<span id="active-transfer-coil"></span>] IMMEDIATELY
+                        <span>👇 TAP ANY CELL TO STORE COIL [<span id="active-transfer-coil"></span>]</span>
+                        <div>
+                            <label>Target Layer:</label>
+                            <select id="selected-layer-opt" class="layer-select-box">
+                                <option value="1">Layer 1 (Base)</option>
+                                <option value="2">Layer 2 (Middle)</option>
+                                <option value="3">Layer 3 (Top)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="yard-selector">
@@ -380,11 +391,11 @@
             'UK SLITTER EXIT': { p1: ['', '', ''], p2: ['', '', ''] }
         };
 
-        // Yard Database
+        // Yard Database (With Pyramid Layer Naming Pattern)
         let yardDatabase = {
             'CGL 1 PRIME': {
-                'A1': { coil: 'C-8010', layer: 1 },
-                'B2': { coil: 'C-8011', layer: 1 }
+                'A1': { coil: 'C-8010', layer: 1, namePattern: 'A1' },
+                'B2': { coil: 'C-8011', layer: 2, namePattern: 'B2C2' }
             },
             'CGL 2 PRIME': {},
             'CGL 1 REWORK': {},
@@ -443,7 +454,6 @@
 
             const data = saddleDatabase[dept] || { p1: ['', '', ''], p2: ['', '', ''] };
             
-            // Populate Inputs and reset button styles dynamically
             const setSaddleSlot = (pit, idx, inputId, btnId) => {
                 const val = data[pit][idx] || '';
                 const inputEl = document.getElementById(inputId);
@@ -478,7 +488,6 @@
 
             saddleDatabase[dept][pit][posIndex] = val;
 
-            // Trigger Animation & Color Shift to Green
             btn.classList.add('placed-active');
             btn.textContent = '✓ Placed';
 
@@ -522,7 +531,7 @@
             }
         }
 
-        // Direct Pickup from Exit Saddle into Yard Placement Mode
+        // Direct Pickup from Exit Saddle into Yard Placement Mode + Auto Scroll
         function cranePickupDirect(dept, pitKey, posIdx, coil) {
             pendingYardPlacement = {
                 id: Date.now(),
@@ -533,51 +542,76 @@
             activateYardPlacementMode();
         }
 
-        // Initiate Transfer from Queue
-        function completeTransfer(reqId) {
-            const req = pendingRequests.find(r => r.id === reqId);
-            if (!req) return;
-
-            pendingYardPlacement = req;
-            activateYardPlacementMode();
-        }
-
-        // Enable Tap-to-Place Mode on Yard Map
+        // Enable Tap-to-Place Mode on Yard Map + AUTO SCROLL TO YARD
         function activateYardPlacementMode() {
             if (!pendingYardPlacement) return;
 
             const banner = document.getElementById('placement-banner');
             document.getElementById('active-transfer-coil').textContent = pendingYardPlacement.coil;
-            banner.style.display = 'block';
+            banner.style.display = 'flex';
 
             renderGrid();
+
+            // AUTO SCROLL TO YARD GRID SECTION TO PREVENT WRONG LOCATION SELECTION
+            document.getElementById('yard-grid-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Handle Direct Tap on Yard Grid Cell (No Popups)
-        function handleCellTap(locId) {
+        // Complete Transfer for Entry Section (DELIVERS DIRECTLY TO ENTRY SECTION - NO YARD OPTION)
+        function completeEntryTransfer(reqId) {
+            const req = pendingRequests.find(r => r.id === reqId);
+            if (!req) return;
+
+            // Clear saddle origin if applicable
+            if (req.saddleOrigin) {
+                const { dept, pitKey, posIdx } = req.saddleOrigin;
+                if (saddleDatabase[dept] && saddleDatabase[dept][pitKey]) {
+                    saddleDatabase[dept][pitKey][posIdx] = '';
+                }
+            }
+
+            // Remove request from pending queue
+            pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+
+            document.getElementById('search-result-display').textContent = `COMPLETED: Coil [${req.coil}] delivered directly to [${req.to}].`;
+
+            changeSaddleDepartment();
+            renderReceiverSaddles();
+            renderQueue();
+        }
+
+        // Handle Direct Tap on Yard Grid Cell
+        function handleCellTap(baseCellId) {
             if (!pendingYardPlacement) {
-                // Normal view mode: Show stored coil info in search bar area
-                const currentData = yardDatabase[activeYard][locId];
+                const currentData = yardDatabase[activeYard][baseCellId];
                 if (currentData) {
-                    document.getElementById('search-result-display').textContent = `SELECTED CELL ${locId}: Coil [${currentData.coil}] (Layer ${currentData.layer})`;
+                    document.getElementById('search-result-display').textContent = `SELECTED CELL [${currentData.namePattern}]: Coil [${currentData.coil}] (Layer ${currentData.layer})`;
                 }
                 return;
             }
 
-            // Yard Placement Mode Active: Automatically place coil into clicked cell
             const targetCoil = pendingYardPlacement.coil;
+            const selectedLayer = parseInt(document.getElementById('selected-layer-opt').value, 10);
 
             if (!yardDatabase[activeYard]) {
                 yardDatabase[activeYard] = {};
             }
 
-            // Stack layer logic
-            const existing = yardDatabase[activeYard][locId];
-            const layer = existing ? existing.layer + 1 : 1;
+            // Pyramid Naming Pattern Logic (e.g. Layer 1 = A1, Layer 2 = A1B1, Layer 3 = A1B1C1)
+            let formattedNamePattern = baseCellId;
+            if (selectedLayer === 2) {
+                const nextCol = String.fromCharCode(baseCellId.charCodeAt(0) + 1);
+                formattedNamePattern = `${baseCellId}${nextCol}${baseCellId.slice(1)}`;
+            } else if (selectedLayer === 3) {
+                const nextCol1 = String.fromCharCode(baseCellId.charCodeAt(0) + 1);
+                const nextCol2 = String.fromCharCode(baseCellId.charCodeAt(0) + 2);
+                const rowNum = baseCellId.slice(1);
+                formattedNamePattern = `${baseCellId}${nextCol1}${rowNum}${nextCol2}${rowNum}`;
+            }
 
-            yardDatabase[activeYard][locId] = {
+            yardDatabase[activeYard][baseCellId] = {
                 coil: targetCoil,
-                layer: layer
+                layer: selectedLayer,
+                namePattern: formattedNamePattern
             };
 
             // Clear saddle origin if applicable
@@ -591,11 +625,11 @@
             // Remove from request queue if present
             pendingRequests = pendingRequests.filter(r => r.id !== pendingYardPlacement.id);
 
-            // Reset Mode
+            // Reset Placement State
             pendingYardPlacement = null;
             document.getElementById('placement-banner').style.display = 'none';
 
-            // Refresh All UI Screen Components seamlessly
+            // Refresh Screen Components
             changeSaddleDepartment();
             renderReceiverSaddles();
             renderQueue();
@@ -635,14 +669,13 @@
                 for (let yard in yardDatabase) {
                     for (let loc in yardDatabase[yard]) {
                         if (yardDatabase[yard][loc].coil === coil) {
-                            detectedLocation = `Yard: ${yard} [${loc}]`;
+                            detectedLocation = `Yard: ${yard} [${yardDatabase[yard][loc].namePattern}]`;
                             break;
                         }
                     }
                 }
             }
 
-            // Reject if location unknown
             if (!detectedLocation) {
                 document.getElementById('search-result-display').textContent = `REJECTED: Coil [${coil}] unknown location.`;
                 return;
@@ -680,7 +713,7 @@
             }
 
             pendingRequests.forEach(req => {
-                // Crane Display Card
+                // Crane Display Card (DELIVERS DIRECTLY TO ENTRY SECTION)
                 const card = document.createElement('div');
                 card.className = 'task-card';
                 card.innerHTML = `
@@ -689,7 +722,7 @@
                         <div class="task-route"><strong>PICKUP LOCATION:</strong> ${req.from}</div>
                         <div class="task-route"><strong>TARGET ENTRY:</strong> ${req.to}</div>
                     </div>
-                    <button class="btn-pickup" onclick="completeTransfer(${req.id})">Complete Transfer</button>
+                    <button class="btn-pickup" onclick="completeEntryTransfer(${req.id})">Complete Transfer to Entry</button>
                 `;
                 craneContainer.appendChild(card);
 
@@ -737,9 +770,9 @@
                     if (coilData) {
                         cell.classList.add('occupied');
                         cell.innerHTML = `
-                            <div class="cell-id">${locId}</div>
+                            <div class="cell-id">${coilData.namePattern}</div>
                             <div class="cell-content">${coilData.coil}</div>
-                            <div class="layer-badge">L${coilData.layer}</div>
+                            <div class="layer-badge">Layer ${coilData.layer}</div>
                         `;
                     } else {
                         cell.innerHTML = `<div class="cell-id">${locId}</div><div class="cell-content" style="color:#bbb;">Tap</div>`;
@@ -794,7 +827,7 @@
                 for (let loc in yardDatabase[yard]) {
                     if (yardDatabase[yard][loc].coil === query) {
                         const locData = yardDatabase[yard][loc];
-                        resultDisplay.textContent = `FOUND: Yard [${yard}] -> Location [${loc}] (Layer ${locData.layer})`;
+                        resultDisplay.textContent = `FOUND: Yard [${yard}] -> Location [${locData.namePattern}] (Layer ${locData.layer})`;
                         switchYard(yard);
                         return;
                     }
