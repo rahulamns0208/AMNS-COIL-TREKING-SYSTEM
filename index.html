@@ -7,19 +7,23 @@
     <style>
         :root {
             --amns-red: #C8102E;
+            --amns-dark-red: #9B0B21;
+            --amns-gray: #F4F5F7;
             --amns-dark: #1E2229;
-            --bg-light: #F4F5F7;
+            --border-color: #D1D5DB;
             --pickup-yellow: #F59E0B;
             --drop-green: #10B981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: var(--bg-light); color: var(--amns-dark); }
+        body { background-color: var(--amns-gray); color: var(--amns-dark); }
 
         header {
-            background-color: var(--amns-red); color: white; padding: 12px 24px;
-            display: flex; justify-content: space-between; align-items: center;
+            background-color: var(--amns-red); color: white;
+            padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;
         }
+
+        .logo-text { font-size: 22px; font-weight: 800; border-right: 2px solid rgba(255,255,255,0.4); padding-right: 15px; }
 
         .mode-switch {
             display: flex; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 6px; gap: 4px;
@@ -30,198 +34,347 @@
         }
         .mode-btn.active { background: white; color: var(--amns-red); }
 
-        .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
+        .main-container { padding: 20px; max-width: 1600px; margin: 0 auto; }
+        .card { background: white; border-radius: 8px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .card-title { font-size: 16px; font-weight: 700; color: var(--amns-red); margin-bottom: 15px; border-bottom: 2px solid var(--amns-red); padding-bottom: 6px; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; color: #4B5563; }
+        select, input { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
+
+        .btn { width: 100%; background-color: var(--amns-red); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background-color: var(--amns-dark-red); }
+        .btn-secondary { background-color: #4B5563; margin-top: 8px; }
 
         /* SENDER STYLING */
-        .sender-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #D1D5DB; margin-bottom: 20px; }
-        .card-title { font-size: 16px; font-weight: 700; color: var(--amns-red); margin-bottom: 12px; border-bottom: 2px solid var(--amns-red); padding-bottom: 4px; }
-        
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 4px; font-size: 14px; }
-        .btn { width: 100%; background: var(--amns-red); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 5px; }
-        .btn:hover { background: #9B0B21; }
+        .sender-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+        .request-item { background: #F3F4F6; border: 1px solid #D1D5DB; border-left: 5px solid var(--amns-red); padding: 12px; margin-bottom: 10px; border-radius: 4px; }
+        .request-item strong { color: var(--amns-red); font-size: 15px; }
 
-        /* RECEIVER (CRANE OPERATOR) STYLING - HIGH VISIBILITY */
-        .task-banner {
-            background: #FEF3C7; border: 3px solid var(--pickup-yellow); padding: 15px; border-radius: 8px;
-            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .task-info { font-size: 20px; font-weight: 800; }
-        .btn-complete { background: var(--drop-green); color: white; padding: 12px 24px; border: none; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        /* RECEIVER & LAYOUT STYLING */
+        .receiver-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .layer-selector { display: flex; gap: 8px; margin-bottom: 15px; }
+        .layer-btn { flex: 1; padding: 8px; background: #E5E7EB; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .layer-btn.active { background: var(--amns-red); color: white; }
+
+        .grid-container { display: grid; gap: 8px; background: #E5E7EB; padding: 15px; border-radius: 8px; }
+        .grid-header, .row-header { font-weight: bold; text-align: center; background: #1E2229; color: white; padding: 8px; border-radius: 4px; }
+        .grid-cell { background: white; border: 2px dashed #9CA3AF; border-radius: 6px; min-height: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+        .grid-cell.occupied { background-color: #FEE2E2; border: 2px solid var(--amns-red); }
+        .grid-cell.highlighted { border: 3px solid #059669; background-color: #D1FAE5; }
+
+        .cell-location { font-size: 11px; font-weight: bold; color: #6B7280; position: absolute; top: 4px; left: 4px; }
+        .coil-badge { background: var(--amns-red); color: white; font-weight: bold; font-size: 11px; padding: 4px 6px; border-radius: 4px; margin-top: 12px; }
 
         /* CGL EXIT PIT SADDLE VISUAL LAYOUT */
-        .pit-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
-        .pit-card { background: #E5E7EB; padding: 15px; border-radius: 8px; border: 2px solid #9CA3AF; }
-        .pit-title { text-align: center; font-weight: 800; font-size: 16px; margin-bottom: 10px; }
-        .saddle-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .pit-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .pit-card { background: #E5E7EB; padding: 12px; border-radius: 8px; border: 2px solid #9CA3AF; }
+        .pit-title { text-align: center; font-weight: 800; font-size: 14px; margin-bottom: 8px; }
+        .saddle-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .saddle-slot {
-            background: white; border: 3px dashed #6B7280; height: 110px; border-radius: 8px;
+            background: white; border: 2px dashed #6B7280; height: 85px; border-radius: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-weight: bold; position: relative; cursor: pointer;
         }
-        .saddle-slot.occupied { background: #FEE2E2; border: 3px solid var(--amns-red); }
-        .saddle-slot.pickup-target { background: #FEF3C7; border: 4px solid var(--pickup-yellow); animation: pulse 1s infinite; }
-        .saddle-slot.drop-target { background: #D1FAE5; border: 4px solid var(--drop-green); animation: pulse 1s infinite; }
+        .saddle-slot.occupied { background: #FEE2E2; border: 2px solid var(--amns-red); }
+        .saddle-slot .slot-name { font-size: 10px; color: #4B5563; position: absolute; top: 4px; left: 4px; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .slot-name { font-size: 12px; color: #4B5563; position: absolute; top: 6px; left: 6px; }
-        .coil-tag { background: var(--amns-red); color: white; padding: 6px 10px; border-radius: 4px; font-size: 15px; font-weight: 800; margin-top: 10px; }
+        .status-msg { padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; display: none; }
+        .status-msg.success { background-color: #DEF7EC; color: #03543F; border: 1px solid #84E1BC; display: block; }
+        .status-msg.error { background-color: #FDE8E8; color: #9B1C1C; border: 1px solid #F8B4B4; display: block; }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="font-size: 20px; font-weight: bold;">AM/NS LOGISTICS SYSTEM</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="logo-text">AM/NS</div>
+            <div style="font-size: 18px; font-weight: 500;">Coil Transfer & Tracking System</div>
+        </div>
         <div class="mode-switch">
-            <button class="mode-btn active" id="btnSender" onclick="switchMode('SENDER')">USER (SENDER / DISPATCH)</button>
-            <button class="mode-btn" id="btnReceiver" onclick="switchMode('RECEIVER')">CRANE OPERATOR (RECEIVER)</button>
+            <button class="mode-btn active" id="btnSenderMode" onclick="switchMode('SENDER')">SENDER (PROCESS / DISPATCH)</button>
+            <button class="mode-btn" id="btnReceiverMode" onclick="switchMode('RECEIVER')">RECEIVER (CRANE OPERATOR)</button>
         </div>
     </header>
 
-    <div class="container">
-        
-        <!-- ==================== MODE 1: USER / SENDER VIEW ==================== -->
-        <div id="senderView" class="sender-grid">
+    <div class="main-container">
+
+        <!-- ==================== SENDER INTERFACE ==================== -->
+        <div id="senderInterface" class="sender-layout">
             <div>
                 <div class="card">
-                    <div class="card-title">1. Move Request to Crane</div>
+                    <div class="card-title">Send Coil Request to Crane</div>
+                    <div id="senderStatus" class="status-msg"></div>
+
                     <div class="form-group">
                         <label>Coil Number</label>
                         <input type="text" id="sendCoilId" placeholder="e.g. COIL-908234">
                     </div>
-                    <div class="form-group">
-                        <label>Pickup From Location</label>
-                        <input type="text" id="sendFromLoc" placeholder="e.g. PIT1-S1 or Yard A1">
-                    </div>
-                    <div class="form-group">
-                        <label>Target Destination</label>
-                        <input type="text" id="sendToLoc" placeholder="e.g. CGL-ENTRY or PIT2-S3">
-                    </div>
-                    <button class="btn" onclick="dispatchTask()">SEND TASK TO CRANE OPERATOR</button>
-                </div>
 
-                <div class="card">
-                    <div class="card-title">2. Quick Exit Saddle Register</div>
                     <div class="form-group">
-                        <label>Exit Saddle Slot</label>
-                        <select id="quickSaddleSlot">
-                            <option value="PIT1-S1">Pit 1 - Saddle Slot 1</option>
-                            <option value="PIT1-S2">Pit 1 - Saddle Slot 2</option>
-                            <option value="PIT1-S3">Pit 1 - Saddle Slot 3</option>
-                            <option value="PIT2-S1">Pit 2 - Saddle Slot 1</option>
-                            <option value="PIT2-S2">Pit 2 - Saddle Slot 2</option>
-                            <option value="PIT2-S3">Pit 2 - Saddle Slot 3</option>
+                        <label>Target Transfer Location (e.g. Entry Section, Pit 1 Saddle 2, Yard A1)</label>
+                        <input type="text" id="sendTargetLoc" placeholder="e.g. CGL ENTRY / A1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Priority / Notes</label>
+                        <select id="sendPriority">
+                            <option value="NORMAL">Normal Priority</option>
+                            <option value="URGENT">Urgent - Direct Line Feed</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Coil Number at Exit</label>
-                        <input type="text" id="quickCoilId" placeholder="e.g. CGL-EXIT-001">
-                    </div>
-                    <button class="btn" style="background:#4B5563;" onclick="registerExitCoil()">REGISTER AT EXIT SADDLE</button>
+
+                    <button class="btn" onclick="sendCoilRequest()">SEND TO CRANE OPERATOR</button>
                 </div>
             </div>
 
             <div>
                 <div class="card">
-                    <div class="card-title">CGL EXIT CAR PIT SADDLES (LIVE MONITORING)</div>
-                    <div class="pit-container" id="senderPitContainer"></div>
+                    <div class="card-title">Active Outgoing Transfer Requests</div>
+                    <div id="senderRequestsList">
+                        <p style="color:#6B7280; font-style:italic;">No requests sent yet.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== MODE 2: CRANE RECEIVER VIEW ==================== -->
-        <div id="receiverView" style="display: none;">
+        <!-- ==================== CRANE OPERATOR INTERFACE ==================== -->
+        <div id="receiverInterface" style="display: none;">
             
-            <div id="activeTaskBanner" class="task-banner" style="display:none;">
-                <div class="task-info">
-                    🚨 ACTIVE TASK: Move Coil <span id="taskCoil" style="color:var(--amns-red);"></span> 
-                    from [<span id="taskFrom"></span>] ➔ to [<span id="taskTo"></span>]
-                </div>
-                <button class="btn-complete" onclick="confirmTaskCompletion()">CONFIRM MOVE COMPLETE</button>
-            </div>
-
-            <div id="noTaskBanner" class="task-banner" style="background:#E5E7EB; border-color:#9CA3AF;">
-                <div class="task-info" style="color:#4B5563;">✅ NO PENDING CRANE TASKS. WAITING FOR SENDER REQUESTS...</div>
-            </div>
-
+            <!-- CGL EXIT PIT SADDLE VISUAL VIEW -->
             <div class="card">
-                <div class="card-title" style="font-size: 20px;">CRANE CABIN VIEW: CGL EXIT PIT SADDLES</div>
-                <div class="pit-container" id="receiverPitContainer"></div>
+                <div class="card-title">CGL EXIT CAR PIT SADDLES (2 PITS - 3 COILS PER PIT)</div>
+                <div class="pit-container" id="pitSaddleContainer"></div>
             </div>
+
+            <div class="receiver-grid">
+                <!-- SIDEBAR: CRANE MANUAL ENTRY & INCOMING REQUESTS -->
+                <div class="sidebar">
+                    <div class="card" style="border-left: 5px solid var(--pickup-yellow);">
+                        <div class="card-title" style="color:var(--pickup-yellow);">Incoming Transfer Requests</div>
+                        <div id="craneTasksList">
+                            <p style="color:#6B7280; font-style:italic;">No pending requests from Sender.</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Crane Manual Placement</div>
+                        <div id="craneStatus" class="status-msg"></div>
+
+                        <div class="form-group">
+                            <label>Department / Layout</label>
+                            <select id="opDepartment" onchange="renderGrid()">
+                                <option value="CGL 1 PRIME">CGL 1 PRIME</option>
+                                <option value="CGL 2 PRIME">CGL 2 PRIME</option>
+                                <option value="CGL 1 REWORK">CGL 1 REWORK</option>
+                                <option value="CGL 2 REWORK">CGL 2 REWORK</option>
+                                <option value="CGL BABY COIL">CGL BABY COIL</option>
+                                <option value="CGL SCRAP">CGL SCRAP</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Layer Height</label>
+                            <select id="opLayer" onchange="updateLocationOptions()">
+                                <option value="L1">Layer 1 (Ground)</option>
+                                <option value="L2">Layer 2 (Double Saddle)</option>
+                                <option value="L3">Layer 3 (Triple Stacking)</option>
+                                <option value="L4">Layer 4 (Quad Stacking)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Grid Location</label>
+                            <select id="opLocation"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Coil Number</label>
+                            <input type="text" id="opCoilId" placeholder="e.g. COIL-908234">
+                        </div>
+
+                        <button class="btn" onclick="placeCoilInYard()">PLACE COIL IN YARD</button>
+                        <button class="btn btn-secondary" onclick="removeCoilFromYard()">REMOVE COIL FROM YARD</button>
+                    </div>
+                </div>
+
+                <!-- MAIN YARD GRID LAYOUT -->
+                <div class="layout-view">
+                    <div class="card">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Search Coil ID or Location (e.g. A1, PIT1-S2)...">
+                            <button class="btn" style="width: 150px;" onclick="searchCoil()">SEARCH</button>
+                            <button class="btn btn-secondary" style="width: 100px; margin-top:0;" onclick="resetSearch()">RESET</button>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 id="currentDeptTitle">CGL 1 PRIME - LAYOUT</h3>
+                            <div class="layer-selector">
+                                <button class="layer-btn active" onclick="switchViewLayer('L1', this)">L1</button>
+                                <button class="layer-btn" onclick="switchViewLayer('L2', this)">L2</button>
+                                <button class="layer-btn" onclick="switchViewLayer('L3', this)">L3</button>
+                                <button class="layer-btn" onclick="switchViewLayer('L4', this)">L4</button>
+                            </div>
+                        </div>
+
+                        <div class="grid-container" id="gridContainer"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
     <script>
-        let currentMode = 'SENDER';
-        let currentTasks = [];
-        let trackingData = {};
-
-        const pitSlots = ['PIT1-S1', 'PIT1-S2', 'PIT1-S3', 'PIT2-S1', 'PIT2-S2', 'PIT2-S3'];
+        const columns = ['A', 'B', 'C', 'D', 'E'];
+        const rows = [1, 2, 3, 4, 5, 6];
+        let currentViewLayer = 'L1';
+        
+        // Local Data Stores (Frontend-only sync)
+        let trackingData = JSON.parse(localStorage.getItem('amns_trackingData')) || {};
+        let transferRequests = JSON.parse(localStorage.getItem('amns_transferRequests')) || [];
 
         window.onload = function() {
-            refreshData();
-            setInterval(refreshData, 2000); // 2-second live sync across screens
+            updateLocationOptions();
+            renderPits();
+            renderGrid();
+            renderSenderRequests();
+            renderCraneTasks();
+
+            // Auto-sync across browser windows every 1 second
+            window.addEventListener('storage', function(e) {
+                trackingData = JSON.parse(localStorage.getItem('amns_trackingData')) || {};
+                transferRequests = JSON.parse(localStorage.getItem('amns_transferRequests')) || [];
+                renderGrid();
+                renderPits();
+                renderSenderRequests();
+                renderCraneTasks();
+            });
         };
 
+        function saveData() {
+            localStorage.setItem('amns_trackingData', JSON.stringify(trackingData));
+            localStorage.setItem('amns_transferRequests', JSON.stringify(transferRequests));
+        }
+
         function switchMode(mode) {
-            currentMode = mode;
-            document.getElementById('btnSender').classList.toggle('active', mode === 'SENDER');
-            document.getElementById('btnReceiver').classList.toggle('active', mode === 'RECEIVER');
-            document.getElementById('senderView').style.display = (mode === 'SENDER') ? 'grid' : 'none';
-            document.getElementById('receiverView').style.display = (mode === 'RECEIVER') ? 'block' : 'none';
-            renderPits();
-        }
-
-        async function refreshData() {
-            try {
-                // Fetch inventory
-                const resCoils = await fetch('/api/coils');
-                const coils = await resCoils.json();
-                trackingData = {};
-                coils.forEach(c => trackingData[c.location] = c.coil_id);
-
-                // Fetch crane tasks
-                const resTasks = await fetch('/api/tasks');
-                currentTasks = await resTasks.json();
-
-                updateTaskBanner();
+            document.getElementById('btnSenderMode').classList.toggle('active', mode === 'SENDER');
+            document.getElementById('btnReceiverMode').classList.toggle('active', mode === 'RECEIVER');
+            document.getElementById('senderInterface').style.display = (mode === 'SENDER') ? 'grid' : 'none';
+            document.getElementById('receiverInterface').style.display = (mode === 'RECEIVER') ? 'block' : 'none';
+            
+            if(mode === 'RECEIVER') {
                 renderPits();
-            } catch (err) {
-                console.error("Sync error:", err);
+                renderGrid();
             }
         }
 
-        function updateTaskBanner() {
-            const activeTask = currentTasks[0];
-            const activeBanner = document.getElementById('activeTaskBanner');
-            const noTaskBanner = document.getElementById('noTaskBanner');
+        /* SENDER FUNCTIONS */
+        function sendCoilRequest() {
+            const coilId = document.getElementById('sendCoilId').value.trim().toUpperCase();
+            const targetLoc = document.getElementById('sendTargetLoc').value.trim().toUpperCase();
+            const priority = document.getElementById('sendPriority').value;
 
-            if (activeTask) {
-                activeBanner.style.display = 'flex';
-                noTaskBanner.style.display = 'none';
-                document.getElementById('taskCoil').innerText = activeTask.coil_id;
-                document.getElementById('taskFrom').innerText = activeTask.from_location;
-                document.getElementById('taskTo').innerText = activeTask.to_location;
-            } else {
-                activeBanner.style.display = 'none';
-                noTaskBanner.style.display = 'flex';
+            if (!coilId || !targetLoc) {
+                showStatus('senderStatus', 'Please enter both Coil Number and Target Location', 'error');
+                return;
             }
+
+            const requestObj = {
+                id: Date.now(),
+                coilId: coilId,
+                targetLoc: targetLoc,
+                priority: priority,
+                status: 'PENDING',
+                time: new Date().toLocaleTimeString()
+            };
+
+            transferRequests.push(requestObj);
+            saveData();
+            renderSenderRequests();
+            renderCraneTasks();
+
+            document.getElementById('sendCoilId').value = '';
+            document.getElementById('sendTargetLoc').value = '';
+            showStatus('senderStatus', `Request for ${coilId} sent to Crane Operator!`, 'success');
         }
 
+        function renderSenderRequests() {
+            const container = document.getElementById('senderRequestsList');
+            if (transferRequests.length === 0) {
+                container.innerHTML = '<p style="color:#6B7280; font-style:italic;">No active transfer requests.</p>';
+                return;
+            }
+
+            container.innerHTML = transferRequests.map(req => `
+                <div class="request-item">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>Coil: ${req.coilId}</strong>
+                        <span style="font-size:11px; color:#6B7280;">${req.time}</span>
+                    </div>
+                    <div>Target: <strong>${req.targetLoc}</strong> | Priority: ${req.priority}</div>
+                    <div style="font-size:12px; font-weight:bold; color:${req.status === 'PENDING' ? '#D97706' : '#059669'};">
+                        Status: ${req.status}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* CRANE OPERATOR FUNCTIONS */
+        function renderCraneTasks() {
+            const container = document.getElementById('craneTasksList');
+            const pendingTasks = transferRequests.filter(r => r.status === 'PENDING');
+
+            if (pendingTasks.length === 0) {
+                container.innerHTML = '<p style="color:#6B7280; font-style:italic;">No pending requests from Sender.</p>';
+                return;
+            }
+
+            container.innerHTML = pendingTasks.map(task => `
+                <div style="background:#FEF3C7; border:2px solid var(--pickup-yellow); padding:10px; border-radius:6px; margin-bottom:10px;">
+                    <div style="font-weight:bold; font-size:14px; color:#92400E;">MOVE: ${task.coilId}</div>
+                    <div style="font-size:12px; margin:4px 0;">Target: <strong>${task.targetLoc}</strong></div>
+                    <button class="btn" style="background:var(--drop-green); padding:6px; font-size:12px;" 
+                        onclick="completeCraneTask(${task.id}, '${task.coilId}', '${task.targetLoc}')">
+                        COMPLETE & PLACE IN LAYOUT
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function completeCraneTask(taskId, coilId, targetLoc) {
+            const reqIndex = transferRequests.findIndex(r => r.id === taskId);
+            if (reqIndex !== -1) {
+                transferRequests[reqIndex].status = 'COMPLETED';
+            }
+
+            const dept = document.getElementById('opDepartment').value;
+            const layer = currentViewLayer;
+
+            if (!trackingData[dept]) trackingData[dept] = {};
+            if (!trackingData[dept][layer]) trackingData[dept][layer] = {};
+            
+            trackingData[dept][layer][targetLoc] = coilId;
+
+            saveData();
+            renderCraneTasks();
+            renderSenderRequests();
+            renderGrid();
+            renderPits();
+            showStatus('craneStatus', `Coil ${coilId} transferred to ${targetLoc}!`, 'success');
+        }
+
+        /* CGL PIT SADDLE VISUAL RENDER (2 PITS - 3 COILS EACH) */
         function renderPits() {
-            const activeTask = currentTasks[0];
-            const containerId = (currentMode === 'SENDER') ? 'senderPitContainer' : 'receiverPitContainer';
-            const container = document.getElementById(containerId);
+            const container = document.getElementById('pitSaddleContainer');
             container.innerHTML = '';
 
             ['PIT 1', 'PIT 2'].forEach((pitName, pIdx) => {
                 let pitCard = document.createElement('div');
                 pitCard.className = 'pit-card';
-                pitCard.innerHTML = `<div class="pit-title">${pitName} CAR SADDLE (3 COIL CAPACITY)</div>`;
+                pitCard.innerHTML = `<div class="pit-title">${pitName} CAR SADDLE</div>`;
                 
                 let saddleRow = document.createElement('div');
                 saddleRow.className = 'saddle-row';
@@ -236,24 +389,20 @@
                     slotLabel.innerText = `Slot ${i} (${slotLoc})`;
                     slotDiv.appendChild(slotLabel);
 
-                    // Check occupancy
-                    if (trackingData[slotLoc]) {
+                    const dept = 'CGL 1 PRIME';
+                    if (trackingData[dept] && trackingData[dept]['L1'] && trackingData[dept]['L1'][slotLoc]) {
                         slotDiv.classList.add('occupied');
                         let tag = document.createElement('div');
-                        tag.className = 'coil-tag';
-                        tag.innerText = trackingData[slotLoc];
+                        tag.className = 'coil-badge';
+                        tag.innerText = trackingData[dept]['L1'][slotLoc];
                         slotDiv.appendChild(tag);
                     }
 
-                    // Receiver Highlighting for Active Task
-                    if (activeTask) {
-                        if (activeTask.from_location === slotLoc) {
-                            slotDiv.classList.add('pickup-target');
-                        }
-                        if (activeTask.to_location === slotLoc) {
-                            slotDiv.classList.add('drop-target');
-                        }
-                    }
+                    slotDiv.onclick = function() {
+                        document.getElementById('opLayer').value = 'L1';
+                        updateLocationOptions();
+                        document.getElementById('opLocation').value = slotLoc;
+                    };
 
                     saddleRow.appendChild(slotDiv);
                 }
@@ -262,57 +411,187 @@
             });
         }
 
-        async function dispatchTask() {
-            const coilId = document.getElementById('sendCoilId').value.trim().toUpperCase();
-            const fromLoc = document.getElementById('sendFromLoc').value.trim().toUpperCase();
-            const toLoc = document.getElementById('sendToLoc').value.trim().toUpperCase();
-
-            if (!coilId || !toLoc) return alert("Fill in Coil ID and Destination");
-
-            await fetch('/api/tasks/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ coil_id: coilId, from_location: fromLoc, to_location: toLoc, task_type: 'MOVE' })
-            });
-
-            document.getElementById('sendCoilId').value = '';
-            document.getElementById('sendFromLoc').value = '';
-            document.getElementById('sendToLoc').value = '';
-            refreshData();
+        /* LAYOUT & GRID RENDER FUNCTIONS */
+        function getLocationListForLayer(layer) {
+            let locations = [];
+            for (let r of rows) {
+                if (layer === 'L1') columns.forEach(c => locations.push(`${c}${r}`));
+                else if (layer === 'L2') for (let i = 0; i < columns.length - 1; i++) locations.push(`${columns[i]}${r}${columns[i+1]}${r}`);
+                else if (layer === 'L3') for (let i = 0; i < columns.length - 2; i++) locations.push(`${columns[i]}${r}${columns[i+1]}${r}${columns[i+2]}${r}`);
+                else if (layer === 'L4') for (let i = 0; i < columns.length - 3; i++) locations.push(`${columns[i]}${r}${columns[i+1]}${r}${columns[i+2]}${r}${columns[i+3]}${r}`);
+            }
+            return locations;
         }
 
-        async function registerExitCoil() {
-            const location = document.getElementById('quickSaddleSlot').value;
-            const coilId = document.getElementById('quickCoilId').value.trim().toUpperCase();
+        function updateLocationOptions() {
+            const layer = document.getElementById('opLayer').value;
+            const locationSelect = document.getElementById('opLocation');
+            locationSelect.innerHTML = '';
 
-            if (!coilId) return alert("Enter Coil ID");
+            // Add Pit Saddles if L1
+            if(layer === 'L1') {
+                ['PIT1-S1', 'PIT1-S2', 'PIT1-S3', 'PIT2-S1', 'PIT2-S2', 'PIT2-S3'].forEach(loc => {
+                    let opt = document.createElement('option');
+                    opt.value = loc; opt.innerText = loc;
+                    locationSelect.appendChild(opt);
+                });
+            }
 
-            await fetch('/api/coils/place', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ department: 'CGL EXIT', layer: 'L1', location, coilId })
+            getLocationListForLayer(layer).forEach(loc => {
+                let opt = document.createElement('option');
+                opt.value = loc; opt.innerText = loc;
+                locationSelect.appendChild(opt);
             });
-
-            document.getElementById('quickCoilId').value = '';
-            refreshData();
         }
 
-        async function confirmTaskCompletion() {
-            if (!currentTasks.length) return;
-            const activeTask = currentTasks[0];
+        function switchViewLayer(layer, btn) {
+            currentViewLayer = layer;
+            document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGrid();
+        }
 
-            await fetch('/api/tasks/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    task_id: activeTask.id,
-                    coil_id: activeTask.coil_id,
-                    from_location: activeTask.from_location,
-                    to_location: activeTask.to_location
-                })
+        function renderGrid() {
+            const dept = document.getElementById('opDepartment').value;
+            document.getElementById('currentDeptTitle').innerText = `${dept} - LAYOUT (${currentViewLayer})`;
+            const gridContainer = document.getElementById('gridContainer');
+            gridContainer.innerHTML = '';
+
+            const numCols = (currentViewLayer === 'L1') ? 5 : (currentViewLayer === 'L2') ? 4 : (currentViewLayer === 'L3') ? 3 : 2;
+            gridContainer.style.gridTemplateColumns = `40px repeat(${numCols}, 1fr)`;
+
+            gridContainer.appendChild(createHeaderCell(''));
+            for(let i = 0; i < numCols; i++) {
+                let colLabel = (currentViewLayer === 'L1') ? columns[i] : `${columns[i]}-${columns[i + (currentViewLayer === 'L2' ? 1 : currentViewLayer === 'L3' ? 2 : 3)]}`;
+                gridContainer.appendChild(createHeaderCell(colLabel));
+            }
+
+            rows.forEach(r => {
+                let rowLabel = document.createElement('div');
+                rowLabel.className = 'row-header';
+                rowLabel.innerText = r;
+                gridContainer.appendChild(rowLabel);
+
+                let availableLocations = getLocationListForLayer(currentViewLayer).filter(loc => loc.endsWith(r.toString()));
+
+                availableLocations.forEach(loc => {
+                    let cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.id = `cell-${dept}-${loc}`;
+
+                    let locBadge = document.createElement('span');
+                    locBadge.className = 'cell-location';
+                    locBadge.innerText = loc;
+                    cell.appendChild(locBadge);
+
+                    if (trackingData[dept] && trackingData[dept][currentViewLayer] && trackingData[dept][currentViewLayer][loc]) {
+                        cell.classList.add('occupied');
+                        let coilBadge = document.createElement('div');
+                        coilBadge.className = 'coil-badge';
+                        coilBadge.innerText = trackingData[dept][currentViewLayer][loc];
+                        cell.appendChild(coilBadge);
+                    }
+
+                    cell.onclick = function() {
+                        document.getElementById('opLayer').value = currentViewLayer;
+                        updateLocationOptions();
+                        document.getElementById('opLocation').value = loc;
+                    };
+
+                    gridContainer.appendChild(cell);
+                });
             });
+        }
 
-            refreshData();
+        function createHeaderCell(text) {
+            let header = document.createElement('div');
+            header.className = 'grid-header';
+            header.innerText = text;
+            return header;
+        }
+
+        function placeCoilInYard() {
+            const dept = document.getElementById('opDepartment').value;
+            const layer = document.getElementById('opLayer').value;
+            const location = document.getElementById('opLocation').value;
+            const coilId = document.getElementById('opCoilId').value.trim().toUpperCase();
+
+            if (!coilId) return showStatus('craneStatus', 'Enter a Coil ID', 'error');
+
+            if (!trackingData[dept]) trackingData[dept] = {};
+            if (!trackingData[dept][layer]) trackingData[dept][layer] = {};
+            trackingData[dept][layer][location] = coilId;
+
+            saveData();
+            showStatus('craneStatus', `Placed ${coilId} @ ${location}`, 'success');
+            document.getElementById('opCoilId').value = '';
+            renderGrid();
+            renderPits();
+        }
+
+        function removeCoilFromYard() {
+            const dept = document.getElementById('opDepartment').value;
+            const layer = document.getElementById('opLayer').value;
+            const location = document.getElementById('opLocation').value;
+
+            if (trackingData[dept] && trackingData[dept][layer]) {
+                delete trackingData[dept][layer][location];
+                saveData();
+                showStatus('craneStatus', `Removed coil from ${location}`, 'success');
+                renderGrid();
+                renderPits();
+            }
+        }
+
+        function searchCoil() {
+            const query = document.getElementById('searchInput').value.trim().toUpperCase();
+            if (!query) return;
+
+            let found = false;
+            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('highlighted'));
+
+            for (let dept in trackingData) {
+                for (let layer in trackingData[dept]) {
+                    for (let loc in trackingData[dept][layer]) {
+                        let coilId = trackingData[dept][layer][loc];
+
+                        if (coilId === query || loc === query) {
+                            found = true;
+                            document.getElementById('opDepartment').value = dept;
+                            currentViewLayer = layer;
+                            
+                            document.querySelectorAll('.layer-btn').forEach(b => {
+                                b.classList.toggle('active', b.innerText.startsWith(layer));
+                            });
+
+                            renderGrid();
+
+                            let targetCell = document.getElementById(`cell-${dept}-${loc}`);
+                            if (targetCell) {
+                                targetCell.classList.add('highlighted');
+                                targetCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+
+                            showStatus('craneStatus', `FOUND: ${coilId} @ Dept: ${dept} | Layer: ${layer} | Loc: ${loc}`, 'success');
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (!found) showStatus('craneStatus', `Coil or Location '${query}' not found!`, 'error');
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('highlighted'));
+            renderGrid();
+        }
+
+        function showStatus(elementId, msg, type) {
+            const statusDiv = document.getElementById(elementId);
+            statusDiv.className = `status-msg ${type}`;
+            statusDiv.innerText = msg;
         }
     </script>
 </body>
