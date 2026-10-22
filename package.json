@@ -1,0 +1,21 @@
+{
+  "name": "amns-coil-tracking-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Internal AM/NS Pune coil tracking system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "create-user": "node scripts/create-user.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-sqlite3": "^0.9.15",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "better-sqlite3": "^11.7.0",
+    "xlsx": "^0.18.5"
+  }
+}
